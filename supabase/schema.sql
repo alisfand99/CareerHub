@@ -220,6 +220,28 @@ alter table public.bio_vault_messages enable row level security;
 alter table public.contacts enable row level security;
 alter table public.contact_job_referrals enable row level security;
 
+-- Idempotent policy refresh (re-run safe)
+do $$
+declare
+  pol record;
+begin
+  for pol in
+    select policyname, tablename
+    from pg_policies
+    where schemaname = 'public'
+      and tablename in (
+        'profiles', 'jobs', 'master_skills', 'experience_blocks', 'projects',
+        'project_skills', 'bio_vault_messages', 'contacts', 'contact_job_referrals'
+      )
+  loop
+    execute format(
+      'drop policy if exists %I on public.%I',
+      pol.policyname,
+      pol.tablename
+    );
+  end loop;
+end $$;
+
 -- Profiles
 create policy "profiles_select_own" on public.profiles for select using (auth.uid() = id);
 create policy "profiles_update_own" on public.profiles for update using (auth.uid() = id);
