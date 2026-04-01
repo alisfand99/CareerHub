@@ -13,6 +13,17 @@ where user_id in (select id from auth.users where email = 'tester@careerhub.loca
 
 delete from auth.users where email = 'tester@careerhub.local';
 
+-- GoTrue expects a row in auth.instances (hosted projects may start empty before first dashboard signup)
+insert into auth.instances (id, uuid, raw_base_config, created_at, updated_at)
+values (
+  '00000000-0000-0000-0000-000000000000'::uuid,
+  '00000000-0000-0000-0000-000000000000'::uuid,
+  '{}',
+  now(),
+  now()
+)
+on conflict (id) do nothing;
+
 -- -----------------------------------------------------------------------------
 -- Test user (fixed UUID so seed rows stay stable)
 -- -----------------------------------------------------------------------------
@@ -20,18 +31,14 @@ do $$
 declare
   v_uid uuid := 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a01'::uuid;
   v_instance uuid;
-  v_pw text := crypt('CareerHub_Test_2026!', gen_salt('bf'));
+  v_pw text := crypt('CareerHub_Test_2026!', gen_salt('bf', 10));
 begin
-  if exists (
-    select 1 from information_schema.tables
-    where table_schema = 'auth' and table_name = 'instances'
-  ) then
-    select id into v_instance from auth.instances limit 1;
-  end if;
+  select id into v_instance from auth.instances limit 1;
   if v_instance is null then
     v_instance := '00000000-0000-0000-0000-000000000000'::uuid;
   end if;
 
+  -- Token columns must be '' not NULL or password grant returns 500 (GoTrue)
   insert into auth.users (
     id,
     instance_id,
@@ -40,6 +47,10 @@ begin
     email,
     encrypted_password,
     email_confirmed_at,
+    confirmation_token,
+    recovery_token,
+    email_change,
+    email_change_token_new,
     raw_app_meta_data,
     raw_user_meta_data,
     created_at,
@@ -53,6 +64,10 @@ begin
     'tester@careerhub.local',
     v_pw,
     now(),
+    '',
+    '',
+    '',
+    '',
     '{"provider":"email","providers":["email"]}'::jsonb,
     '{"full_name":"CareerHub Tester"}'::jsonb,
     now(),
@@ -74,7 +89,7 @@ begin
     v_uid,
     format('{"sub":"%s","email":"tester@careerhub.local"}', v_uid)::jsonb,
     'email',
-    'tester@careerhub.local',
+    v_uid::text,
     now(),
     now(),
     now()
@@ -140,7 +155,7 @@ insert into public.experience_blocks (
   id, user_id, title, organization, location, start_date, end_date, is_current, bullets, raw_ingest
 )
 values (
-  'g6000001-0000-4000-8000-000000000001'::uuid,
+  'a6000001-0000-4000-8000-000000000001'::uuid,
   'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a01'::uuid,
   'Principal Engineer',
   'Lumen Analytics',
@@ -179,14 +194,14 @@ values
 insert into public.bio_vault_messages (id, user_id, role, content, metadata)
 values
   (
-    'h7000001-0000-4000-8000-000000000001'::uuid,
+    'b7000001-0000-4000-8000-000000000001'::uuid,
     'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a01'::uuid,
     'user',
     'Shipped dark-mode analytics overhaul; stakeholders praised clarity of KPI drill-downs.',
     '{"source":"chat-ingest"}'::jsonb
   ),
   (
-    'h7000002-0000-4000-8000-000000000002'::uuid,
+    'b7000002-0000-4000-8000-000000000002'::uuid,
     'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a01'::uuid,
     'assistant',
     'Parsed update → added evidence to master_skills + project metrics draft.',
@@ -231,7 +246,7 @@ insert into public.contact_job_referrals (
   id, user_id, contact_id, job_id, status, outreach_draft
 )
 values (
-  'i8000001-0000-4000-8000-000000000001'::uuid,
+  'c8000001-0000-4000-8000-000000000001'::uuid,
   'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a01'::uuid,
   'f5000001-0000-4000-8000-000000000001'::uuid,
   'e4000001-0000-4000-8000-000000000001'::uuid,

@@ -2,8 +2,9 @@
  * Applies supabase/provision_all.sql when Postgres credentials are available.
  *
  * Set ONE of:
- *   DATABASE_URL=postgresql://postgres:PASSWORD@db.<ref>.supabase.co:5432/postgres
- *   SUPABASE_DB_PASSWORD=<database password>  (uses NEXT_PUBLIC_SUPABASE_URL for host)
+ *   DATABASE_URL=postgresql://postgres:PASSWORD@db.<ref>.supabase.co:6543/postgres
+ *   SUPABASE_DB_PASSWORD=<database password>  (builds URI on db.<ref>.supabase.co — default port 6543 pooler; 5432 often IPv6-only)
+ *   SUPABASE_DB_PORT=5432  (optional override)
  *
  * Password: Supabase Dashboard → Settings → Database → Database password
  */
@@ -33,7 +34,8 @@ function buildDatabaseUrl() {
   }
   const ref = host.split(".")[0];
   const enc = encodeURIComponent(pw);
-  return `postgresql://postgres:${enc}@db.${ref}.supabase.co:5432/postgres`;
+  const port = process.env.SUPABASE_DB_PORT || "6543";
+  return `postgresql://postgres:${enc}@db.${ref}.supabase.co:${port}/postgres`;
 }
 
 async function main() {
@@ -51,6 +53,7 @@ async function main() {
   const client = new pg.Client({
     connectionString: conn,
     ssl: { rejectUnauthorized: false },
+    connectionTimeoutMillis: 60000,
   });
 
   await client.connect();
