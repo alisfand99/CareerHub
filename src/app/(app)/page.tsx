@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { isSupabaseConfigured } from "@/lib/supabase/env";
 import {
   emptyDashboardStats,
   getDashboardStats,
@@ -33,9 +34,7 @@ const jobLabels: Record<string, string> = {
 };
 
 export default async function DashboardPage() {
-  const configured =
-    Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL) &&
-    Boolean(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+  const configured = isSupabaseConfigured();
 
   let stats = emptyDashboardStats();
   let loadError: string | null = null;
@@ -79,7 +78,9 @@ export default async function DashboardPage() {
           <CardHeader>
             <CardTitle className="text-base">Configure Supabase</CardTitle>
             <CardDescription>
-              Add{" "}
+              On Vercel (or your host):{" "}
+              <strong className="text-foreground">Settings → Environment Variables</strong>{" "}
+              — add{" "}
               <code className="rounded bg-muted px-1 py-0.5 text-xs">
                 NEXT_PUBLIC_SUPABASE_URL
               </code>{" "}
@@ -87,15 +88,12 @@ export default async function DashboardPage() {
               <code className="rounded bg-muted px-1 py-0.5 text-xs">
                 NEXT_PUBLIC_SUPABASE_ANON_KEY
               </code>{" "}
-              to{" "}
+              (or{" "}
               <code className="rounded bg-muted px-1 py-0.5 text-xs">
-                .env.local
+                NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY
               </code>
-              , then run the SQL in{" "}
-              <code className="rounded bg-muted px-1 py-0.5 text-xs">
-                supabase/schema.sql
-              </code>
-              .
+              ), then <strong className="text-foreground">Redeploy</strong>. Locally use{" "}
+              <code className="rounded bg-muted px-1 py-0.5 text-xs">.env.local</code>.
             </CardDescription>
           </CardHeader>
         </Card>

@@ -1,12 +1,15 @@
 import { createBrowserClient } from "@supabase/ssr";
+import {
+  getSupabaseAnonKey,
+  getSupabaseUrl,
+  missingSupabaseEnvMessage,
+} from "./env";
 
 export function createClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const url = getSupabaseUrl();
+  const key = getSupabaseAnonKey();
   if (!url || !key) {
-    throw new Error(
-      "Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY",
-    );
+    throw new Error(missingSupabaseEnvMessage);
   }
   return createBrowserClient(url, key);
 }

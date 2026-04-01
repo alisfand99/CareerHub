@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { getSupabaseAnonKey, getSupabaseUrl } from "@/lib/supabase/env";
 
 export async function GET(request: NextRequest) {
   const url = new URL(request.url);
@@ -11,8 +12,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(`${origin}/login?error=auth`);
   }
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const supabaseUrl = getSupabaseUrl();
+  const supabaseKey = getSupabaseAnonKey();
   if (!supabaseUrl || !supabaseKey) {
     return NextResponse.redirect(`${origin}/login?error=config`);
   }

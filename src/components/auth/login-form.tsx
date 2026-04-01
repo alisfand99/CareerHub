@@ -13,28 +13,40 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { cn } from "@/lib/utils";
+
+type Mode = "password" | "magic";
+
+function formatAuthError(err: unknown): string {
+  if (err instanceof Error && err.message.includes("MISSING_SUPABASE_ENV")) {
+    return "این دپلویمنت به Supabase وصل نیست. در Vercel برو Settings → Environment Variables و این دو را اضافه کن، بعد Redeploy: NEXT_PUBLIC_SUPABASE_URL و NEXT_PUBLIC_SUPABASE_ANON_KEY (یا کلید publishable).";
+  }
+  if (err instanceof Error && err.message.length > 0) {
+    return err.message;
+  }
+  return "خطای شبکه یا سرور. دوباره تلاش کن.";
+}
 
 export function LoginForm() {
   const router = useRouter();
+  const [mode, setMode] = useState<Mode>("password");
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [pwStatus, setPwStatus] = useState<
-    "idle" | "loading" | "error" | "success"
-  >("idle");
+  const [pwLoading, setPwLoading] = useState(false);
   const [pwMessage, setPwMessage] = useState<string | null>(null);
+  const [pwError, setPwError] = useState(false);
 
-  const [otpEmail, setOtpEmail] = useState("");
-  const [otpStatus, setOtpStatus] = useState<
-    "idle" | "sending" | "sent" | "error"
-  >("idle");
-  const [otpMessage, setOtpMessage] = useState<string | null>(null);
+  const [magicEmail, setMagicEmail] = useState("");
+  const [magicLoading, setMagicLoading] = useState(false);
+  const [magicMessage, setMagicMessage] = useState<string | null>(null);
+  const [magicError, setMagicError] = useState(false);
 
   async function onPasswordSignIn(e: React.FormEvent) {
     e.preventDefault();
-    setPwStatus("loading");
+    setPwLoading(true);
     setPwMessage(null);
+    setPwError(false);
     try {
       const supabase = createClient();
       const { error } = await supabase.auth.signInWithPassword({
@@ -42,153 +54,194 @@ export function LoginForm() {
         password,
       });
       if (error) {
-        setPwStatus("error");
+        setPwError(true);
         setPwMessage(error.message);
         return;
       }
-      setPwStatus("success");
       router.refresh();
       router.push("/");
-    } catch {
-      setPwStatus("error");
-      setPwMessage(
-        "Could not reach Supabase. Check NEXT_PUBLIC_SUPABASE_URL and keys on this deployment.",
-      );
+    } catch (err) {
+      setPwError(true);
+      setPwMessage(formatAuthError(err));
+    } finally {
+      setPwLoading(false);
     }
   }
 
   async function onMagicLink(e: React.FormEvent) {
     e.preventDefault();
-    setOtpStatus("sending");
-    setOtpMessage(null);
+    setMagicLoading(true);
+    setMagicMessage(null);
+    setMagicError(false);
     try {
       const supabase = createClient();
       const origin = window.location.origin;
       const { error } = await supabase.auth.signInWithOtp({
-        email: otpEmail,
+        email: magicEmail,
         options: {
           emailRedirectTo: `${origin}/auth/callback`,
         },
       });
       if (error) {
-        setOtpStatus("error");
-        setOtpMessage(error.message);
+        setMagicError(true);
+        setMagicMessage(error.message);
         return;
       }
-      setOtpStatus("sent");
-      setOtpMessage("Check your email for the magic link.");
-    } catch {
-      setOtpStatus("error");
-      setOtpMessage("Something went wrong. Check your Supabase environment keys.");
+      setMagicError(false);
+      setMagicMessage("لینک ورود به ایمیلت فرستاده شد.");
+    } catch (err) {
+      setMagicError(true);
+      setMagicMessage(formatAuthError(err));
+    } finally {
+      setMagicLoading(false);
     }
   }
 
   return (
-    <Card className="w-full max-w-md border-border/80 shadow-lg">
-      <CardHeader>
-        <CardTitle className="text-xl">Sign in</CardTitle>
-        <CardDescription>
-          Use email and password, or get a one-time link by email.
+    <Card className="w-full max-w-[400px] border-white/10 bg-zinc-950/80 shadow-2xl shadow-black/40 backdrop-blur-xl">
+      <CardHeader className="space-y-1 pb-2 text-center sm:text-left">
+        <CardTitle className="text-xl font-semibold tracking-tight">
+          ورود
+        </CardTitle>
+        <CardDescription className="text-sm leading-relaxed text-zinc-400">
+          با ایمیل و رمز عبور، یا لینک یک‌بار مصرف.
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <Tabs defaultValue="password" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="password">Email & password</TabsTrigger>
-            <TabsTrigger value="magic">Magic link</TabsTrigger>
-          </TabsList>
+      <CardContent className="space-y-6 pt-2">
+        <div
+          className="flex h-10 rounded-lg bg-zinc-900/80 p-1 ring-1 ring-white/10"
+          role="tablist"
+        >
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mode === "password"}
+            className={cn(
+              "flex-1 rounded-md text-sm font-medium transition-all",
+              mode === "password"
+                ? "bg-zinc-800 text-zinc-50 shadow-sm ring-1 ring-white/10"
+                : "text-zinc-500 hover:text-zinc-300",
+            )}
+            onClick={() => {
+              setMode("password");
+              setPwMessage(null);
+            }}
+          >
+            رمز عبور
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mode === "magic"}
+            className={cn(
+              "flex-1 rounded-md text-sm font-medium transition-all",
+              mode === "magic"
+                ? "bg-zinc-800 text-zinc-50 shadow-sm ring-1 ring-white/10"
+                : "text-zinc-500 hover:text-zinc-300",
+            )}
+            onClick={() => {
+              setMode("magic");
+              setMagicMessage(null);
+            }}
+          >
+            لینک ایمیل
+          </button>
+        </div>
 
-          <TabsContent value="password" className="mt-4 space-y-4">
-            <form onSubmit={onPasswordSignIn} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="login-email">Email</Label>
-                <Input
-                  id="login-email"
-                  type="email"
-                  required
-                  autoComplete="email"
-                  placeholder="you@company.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={pwStatus === "loading"}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="login-password">Password</Label>
-                <Input
-                  id="login-password"
-                  type="password"
-                  required
-                  autoComplete="current-password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  disabled={pwStatus === "loading"}
-                />
-              </div>
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={pwStatus === "loading"}
+        {mode === "password" ? (
+          <form onSubmit={onPasswordSignIn} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="login-email" className="text-zinc-300">
+                ایمیل
+              </Label>
+              <Input
+                id="login-email"
+                type="email"
+                required
+                autoComplete="email"
+                placeholder="name@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={pwLoading}
+                className="h-11 border-white/10 bg-zinc-900/50 text-zinc-100 placeholder:text-zinc-600"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="login-password" className="text-zinc-300">
+                رمز عبور
+              </Label>
+              <Input
+                id="login-password"
+                type="password"
+                required
+                autoComplete="current-password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={pwLoading}
+                className="h-11 border-white/10 bg-zinc-900/50 text-zinc-100 placeholder:text-zinc-600"
+              />
+            </div>
+            <Button
+              type="submit"
+              className="h-11 w-full font-medium"
+              disabled={pwLoading}
+            >
+              {pwLoading ? "در حال ورود…" : "ورود"}
+            </Button>
+            {pwMessage ? (
+              <p
+                className={cn(
+                  "rounded-md border px-3 py-2 text-sm leading-snug",
+                  pwError
+                    ? "border-red-500/30 bg-red-500/10 text-red-200"
+                    : "border-white/10 text-zinc-400",
+                )}
               >
-                {pwStatus === "loading" ? "Signing in…" : "Sign in"}
-              </Button>
-              {pwMessage ? (
-                <p
-                  className={
-                    pwStatus === "error"
-                      ? "text-sm text-destructive"
-                      : "text-sm text-muted-foreground"
-                  }
-                >
-                  {pwMessage}
-                </p>
-              ) : null}
-            </form>
-          </TabsContent>
-
-          <TabsContent value="magic" className="mt-4 space-y-4">
-            <form onSubmit={onMagicLink} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="magic-email">Email</Label>
-                <Input
-                  id="magic-email"
-                  type="email"
-                  required
-                  autoComplete="email"
-                  placeholder="you@company.com"
-                  value={otpEmail}
-                  onChange={(e) => setOtpEmail(e.target.value)}
-                  disabled={otpStatus === "sending"}
-                />
-              </div>
-              <Button
-                type="submit"
-                className="w-full"
-                variant="secondary"
-                disabled={otpStatus === "sending"}
+                {pwMessage}
+              </p>
+            ) : null}
+          </form>
+        ) : (
+          <form onSubmit={onMagicLink} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="magic-email" className="text-zinc-300">
+                ایمیل
+              </Label>
+              <Input
+                id="magic-email"
+                type="email"
+                required
+                autoComplete="email"
+                placeholder="name@example.com"
+                value={magicEmail}
+                onChange={(e) => setMagicEmail(e.target.value)}
+                disabled={magicLoading}
+                className="h-11 border-white/10 bg-zinc-900/50 text-zinc-100 placeholder:text-zinc-600"
+              />
+            </div>
+            <Button
+              type="submit"
+              variant="secondary"
+              className="h-11 w-full font-medium"
+              disabled={magicLoading}
+            >
+              {magicLoading ? "در حال ارسال…" : "ارسال لینک ورود"}
+            </Button>
+            {magicMessage ? (
+              <p
+                className={cn(
+                  "rounded-md border px-3 py-2 text-sm leading-snug",
+                  magicError
+                    ? "border-red-500/30 bg-red-500/10 text-red-200"
+                    : "border-emerald-500/20 bg-emerald-500/10 text-emerald-200",
+                )}
               >
-                {otpStatus === "sending" ? "Sending…" : "Send magic link"}
-              </Button>
-              {otpMessage ? (
-                <p
-                  className={
-                    otpStatus === "error"
-                      ? "text-sm text-destructive"
-                      : "text-sm text-muted-foreground"
-                  }
-                >
-                  {otpMessage}
-                </p>
-              ) : null}
-            </form>
-          </TabsContent>
-        </Tabs>
-
-        <Separator className="my-6" />
-        <p className="text-center text-xs text-muted-foreground">
-          After signing in, dashboard stats load from your Supabase data (RLS).
-        </p>
+                {magicMessage}
+              </p>
+            ) : null}
+          </form>
+        )}
       </CardContent>
     </Card>
   );
