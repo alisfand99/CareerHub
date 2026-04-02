@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/layout/app-shell";
+import { OrchestratorShell } from "@/components/orchestrator/orchestrator-shell";
 
 export default async function AppLayout({
   children,
@@ -17,5 +18,9 @@ export default async function AppLayout({
     userEmail = null;
   }
 
-  return <AppShell userEmail={userEmail}>{children}</AppShell>;
+  return (
+    <OrchestratorShell>
+      <AppShell userEmail={userEmail}>{children}</AppShell>
+    </OrchestratorShell>
+  );
 }

@@ -9,12 +9,23 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 
-export function DashboardTourDialog() {
+export function DashboardTourDialog({
+  triggerClassName,
+}: {
+  triggerClassName?: string;
+}) {
   return (
     <Dialog>
       <DialogTrigger
-        render={<Button variant="outline" size="sm" className="shrink-0" />}
+        render={
+          <Button
+            variant="outline"
+            size="sm"
+            className={cn("shrink-0", triggerClassName)}
+          />
+        }
       >
         Three pillars
       </DialogTrigger>

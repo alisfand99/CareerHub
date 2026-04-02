@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Career-Hub AI — Presentation captures</title>
+    <style>
+      :root {
+        --bg: #0a0f1a;
+        --card: #111827;
+        --line: rgba(34, 211, 238, 0.2);
+        --text: #e5e7eb;
+        --muted: #9ca3af;
+        --accent: #22d3ee;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        letter-spacing: -0.02em;
+        line-height: 1.5;
+      }
+      .wrap {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 3rem 1.5rem 4rem;
+      }
+      header {
+        text-align: center;
+        margin-bottom: 3rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid var(--line);
+      }
+      header h1 {
+        margin: 0 0 0.5rem;
+        font-size: clamp(1.75rem, 4vw, 2.25rem);
+        font-weight: 600;
+        letter-spacing: -0.03em;
+      }
+      header p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+      .badge {
+        display: inline-block;
+        margin-top: 1rem;
+        padding: 0.35rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--accent);
+        border: 1px solid var(--line);
+        background: rgba(34, 211, 238, 0.06);
+      }
+      .grid {
+        display: grid;
+        gap: 2.5rem;
+      }
+      figure {
+        margin: 0;
+        border-radius: 1rem;
+        overflow: hidden;
+        background: var(--card);
+        border: 1px solid var(--line);
+        box-shadow: 0 24px 64px -16px rgba(0, 0, 0, 0.55),
+          0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+      }
+      figure img {
+        display: block;
+        width: 100%;
+        height: auto;
+        vertical-align: middle;
+      }
+      figcaption {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 1rem 1.25rem;
+        font-size: 0.875rem;
+        border-top: 1px solid var(--line);
+        background: rgba(0, 0, 0, 0.25);
+      }
+      figcaption strong {
+        font-weight: 600;
+      }
+      figcaption span {
+        color: var(--muted);
+        font-size: 0.8rem;
+      }
+      footer {
+        margin-top: 3rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--line);
+        text-align: center;
+        font-size: 0.75rem;
+        color: var(--muted);
+      }
+      @media print {
+        body {
+          background: #fff;
+          color: #111;
+        }
+        figure {
+          break-inside: avoid;
+          box-shadow: none;
+          border: 1px solid #ddd;
+        }
+        .badge {
+          border-color: #ccc;
+          color: #0369a1;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <h1>Career-Hub AI</h1>
+        <p>Product screenshots for decks · 1600×1000 · production build</p>
+        <span class="badge">Presentation pack</span>
+      </header>
+
+      <div class="grid">
+        <figure>
+          <img src="./01-login.png" alt="Sign in" width="1600" height="1000" />
+          <figcaption>
+            <strong>01 · Sign in</strong>
+            <span>/login</span>
+          </figcaption>
+        </figure>
+        <figure>
+          <img src="./02-dashboard.png" alt="Dashboard" width="1600" height="1000" />
+          <figcaption>
+            <strong>02 · Dashboard</strong>
+            <span>Neural command map · Summary</span>
+          </figcaption>
+        </figure>
+        <figure>
+          <img src="./03-apply-hub.png" alt="Apply Hub" width="1600" height="1000" />
+          <figcaption>
+            <strong>03 · Apply Hub</strong>
+            <span>Pipeline Kanban</span>
+          </figcaption>
+        </figure>
+        <figure>
+          <img src="./04-bio-vault.png" alt="Bio-Vault" width="1600" height="1000" />
+          <figcaption>
+            <strong>04 · Bio-Vault</strong>
+            <span>Skill vault &amp; market insights</span>
+          </figcaption>
+        </figure>
+        <figure>
+          <img src="./05-network-crm.png" alt="Network CRM" width="1600" height="1000" />
+          <figcaption>
+            <strong>05 · Network CRM</strong>
+            <span>Contacts &amp; referrals</span>
+          </figcaption>
+        </figure>
+      </div>
+
+      <footer>
+        Open this file in a browser for a clean gallery, or drop the PNGs into
+        PowerPoint / Keynote. Re-capture: <code>npm run presentation:capture</code>
+        (after <code>npm run build</code>).
+      </footer>
+    </div>
+  </body>
+</html>

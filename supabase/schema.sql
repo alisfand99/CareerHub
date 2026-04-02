@@ -90,6 +90,7 @@ create table if not exists public.master_skills (
   tools text[] default array[]::text[],
   metrics jsonb default '{}'::jsonb,
   evidence text,
+  metadata jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );

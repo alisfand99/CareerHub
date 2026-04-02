@@ -9,12 +9,12 @@ import { cn } from "@/lib/utils";
 
 function formatAuthError(err: unknown): string {
   if (err instanceof Error && err.message.includes("MISSING_SUPABASE_ENV")) {
-    return "سرور به Supabase وصل نیست. در Vercel → Settings → Environment Variables مقدارهای NEXT_PUBLIC_SUPABASE_URL و NEXT_PUBLIC_SUPABASE_ANON_KEY را بگذار و Redeploy کن.";
+    return "Supabase is not configured. On Vercel: Settings → Environment Variables — set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY (or NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY), then Redeploy. Locally, use .env.local.";
   }
   if (err instanceof Error && err.message.length > 0) {
     return err.message;
   }
-  return "خطا در اتصال. دوباره تلاش کن.";
+  return "Something went wrong. Please try again.";
 }
 
 export function LoginForm() {
@@ -51,24 +51,30 @@ export function LoginForm() {
     }
   }
 
+  const inputClass = cn(
+    "box-border w-full min-h-12 rounded-sm border border-slate-300 bg-white px-3 py-2.5 text-base text-slate-900 shadow-sm",
+    "placeholder:text-slate-400 outline-none transition-colors",
+    "focus-visible:border-brand-action focus-visible:ring-2 focus-visible:ring-brand-action/25",
+    "disabled:cursor-not-allowed disabled:bg-slate-50 disabled:opacity-60",
+  );
+
   return (
     <div
       className={cn(
-        "w-full max-w-[420px] rounded-xl border border-zinc-700/80 bg-zinc-900 p-8 shadow-lg",
-        "mx-auto",
+        "mx-auto w-full max-w-md rounded-sm border border-slate-200/90 bg-white p-8 shadow-xl md:p-10",
       )}
     >
-      <h2 className="text-lg font-semibold tracking-tight text-zinc-50">
-        ورود
+      <h2 className="text-lg font-bold tracking-tight text-brand-navy">
+        Sign in
       </h2>
-      <p className="mt-1 text-sm text-zinc-400">
-        ایمیل و رمز عبور حساب Supabase خود را وارد کن.
+      <p className="mt-1 text-sm text-slate-600">
+        Enter the email and password for your Supabase account.
       </p>
 
       <form onSubmit={onSubmit} className="mt-8 flex w-full flex-col gap-5">
         <div className="flex w-full flex-col gap-2">
-          <Label htmlFor="login-email" className="text-sm text-zinc-300">
-            ایمیل
+          <Label htmlFor="login-email" className="text-sm font-medium text-slate-700">
+            Email
           </Label>
           <input
             id="login-email"
@@ -79,18 +85,16 @@ export function LoginForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={loading}
-            className={cn(
-              "box-border w-full min-h-11 rounded-md border border-zinc-600 bg-zinc-950 px-3 py-2.5 text-base text-zinc-100",
-              "placeholder:text-zinc-500 outline-none transition-colors",
-              "focus-visible:border-zinc-400 focus-visible:ring-2 focus-visible:ring-zinc-500/30",
-              "disabled:opacity-50",
-            )}
+            className={inputClass}
           />
         </div>
 
         <div className="flex w-full flex-col gap-2">
-          <Label htmlFor="login-password" className="text-sm text-zinc-300">
-            رمز عبور
+          <Label
+            htmlFor="login-password"
+            className="text-sm font-medium text-slate-700"
+          >
+            Password
           </Label>
           <input
             id="login-password"
@@ -101,31 +105,29 @@ export function LoginForm() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             disabled={loading}
-            className={cn(
-              "box-border w-full min-h-11 rounded-md border border-zinc-600 bg-zinc-950 px-3 py-2.5 text-base text-zinc-100",
-              "placeholder:text-zinc-500 outline-none transition-colors",
-              "focus-visible:border-zinc-400 focus-visible:ring-2 focus-visible:ring-zinc-500/30",
-              "disabled:opacity-50",
-            )}
+            className={inputClass}
           />
         </div>
 
         <Button
           type="submit"
           disabled={loading}
-          className="mt-1 h-10 w-full text-sm font-medium"
+          className={cn(
+            "mt-1 h-12 w-full rounded-sm border-0 bg-brand-action text-base font-semibold text-white shadow-sm",
+            "hover:bg-brand-action-hover focus-visible:ring-brand-action/40",
+          )}
         >
-          {loading ? "در حال ورود…" : "ورود"}
+          {loading ? "Signing in…" : "Sign in"}
         </Button>
 
         {message ? (
           <p
             role="alert"
             className={cn(
-              "rounded-md px-3 py-2 text-sm leading-relaxed",
+              "rounded-sm px-3 py-2.5 text-sm leading-relaxed",
               isError
-                ? "bg-red-950/50 text-red-200 ring-1 ring-red-500/30"
-                : "text-zinc-400 ring-1 ring-zinc-700",
+                ? "bg-red-50 text-red-800 ring-1 ring-red-200"
+                : "bg-slate-50 text-slate-600 ring-1 ring-slate-200",
             )}
           >
             {message}

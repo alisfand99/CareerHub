@@ -127,7 +127,7 @@ values
   );
 
 insert into public.master_skills (
-  id, user_id, name, category, proficiency, tools, metrics, evidence
+  id, user_id, name, category, proficiency, tools, metrics, evidence, metadata
 )
 values
   (
@@ -138,7 +138,8 @@ values
     5,
     array['Next.js', 'TypeScript', 'Tailwind CSS', 'Supabase'],
     '{"impact":"Cut LCP 38% on flagship funnel"}'::jsonb,
-    'Led App Router migration and unified design tokens across 6 squads.'
+    'Led App Router migration and unified design tokens across 6 squads.',
+    '{"origin":"acquired","source":"seed"}'::jsonb
   ),
   (
     'c2000002-0000-4000-8000-000000000002'::uuid,
@@ -148,7 +149,8 @@ values
     4,
     array['Notion', 'Linear', 'Gemini'],
     '{"cadence":"Weekly pipeline reviews with qualitative notes"}'::jsonb,
-    'Built personal CRM + evidence vault powering tailored outreach.'
+    'Built personal CRM + evidence vault powering tailored outreach.',
+    '{"origin":"acquired","source":"seed"}'::jsonb
   );
 
 insert into public.experience_blocks (

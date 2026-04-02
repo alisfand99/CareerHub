@@ -10,6 +10,13 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        brand: {
+          navy: "#0a192f",
+          "navy-deep": "#001d3d",
+          action: "#0056D2",
+          "action-hover": "#0047b0",
+          surface: "#f8f9fa",
+        },
         background: "var(--background)",
         foreground: "var(--foreground)",
         card: {

@@ -1,30 +1,43 @@
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import Link from "next/link";
+import { createClient } from "@/lib/supabase/server";
+import { isSupabaseConfigured } from "@/lib/supabase/env";
+import { fetchUserJobs } from "@/lib/queries/jobs";
+import { ApplyHubBoard } from "./apply-hub-board";
+import { buttonVariants } from "@/components/ui/button-variants";
+import { cn } from "@/lib/utils";
 
-export default function ApplyHubPage() {
-  return (
-    <div className="mx-auto max-w-3xl space-y-4">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Apply Hub</h1>
+export default async function ApplyHubPage() {
+  if (!isSupabaseConfigured()) {
+    return (
+      <div className="mx-auto max-w-lg space-y-4 text-center">
+        <h1 className="text-2xl font-semibold">Apply Hub</h1>
         <p className="text-sm text-muted-foreground">
-          Kanban pipeline and Gemini-powered JD gap analysis (Phase 2).
+          Configure Supabase environment variables to load your pipeline.
         </p>
       </div>
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Coming next</CardTitle>
-          <CardDescription>
-            Columns for Wishlist, Applied, Interview, and Offer; slide-over job
-            entry; Supabase{" "}
-            <code className="rounded bg-muted px-1 py-0.5 text-xs">jobs</code>{" "}
-            integration.
-          </CardDescription>
-        </CardHeader>
-      </Card>
-    </div>
-  );
+    );
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return (
+      <div className="mx-auto max-w-lg space-y-4 text-center">
+        <h1 className="text-2xl font-semibold">Apply Hub</h1>
+        <p className="text-sm text-muted-foreground">
+          Sign in to view and manage your applications.
+        </p>
+        <Link href="/login" className={cn(buttonVariants())}>
+          Sign in
+        </Link>
+      </div>
+    );
+  }
+
+  const jobs = await fetchUserJobs(supabase, user.id);
+
+  return <ApplyHubBoard initialJobs={jobs} />;
 }
