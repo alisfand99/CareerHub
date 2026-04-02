@@ -1,11 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   transpilePackages: ["framer-motion"],
-  // Keep compiled route modules in memory longer in dev (fewer stale chunk mismatches).
-  onDemandEntries: {
-    maxInactiveAge: 120 * 1000,
-    pagesBufferLength: 8,
-  },
+  // No custom webpack / onDemandEntries — defaults avoid stale dev chunks after refactors.
 };
 
 export default nextConfig;

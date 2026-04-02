@@ -23,9 +23,22 @@ $$;
 create table if not exists public.profiles (
   id uuid primary key references auth.users (id) on delete cascade,
   display_name text,
+  headline text,
+  summary text,
+  phone text,
+  location text,
+  website text,
+  public_email text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table public.profiles add column if not exists headline text;
+alter table public.profiles add column if not exists summary text;
+alter table public.profiles add column if not exists phone text;
+alter table public.profiles add column if not exists location text;
+alter table public.profiles add column if not exists website text;
+alter table public.profiles add column if not exists public_email text;
 
 drop trigger if exists profiles_set_updated_at on public.profiles;
 create trigger profiles_set_updated_at
@@ -174,6 +187,9 @@ create table if not exists public.contacts (
   email text,
   company text,
   role_title text,
+  linkedin_url text,
+  phone text,
+  keywords text[] default array[]::text[],
   relationship_strength smallint not null default 3
     check (relationship_strength between 1 and 5),
   notes text,
@@ -184,6 +200,11 @@ create table if not exists public.contacts (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+-- Existing deployments (table created before these columns existed)
+alter table public.contacts add column if not exists linkedin_url text;
+alter table public.contacts add column if not exists phone text;
+alter table public.contacts add column if not exists keywords text[] default array[]::text[];
 
 create index if not exists contacts_user_id_idx on public.contacts (user_id);
 create index if not exists contacts_referral_job_idx on public.contacts (referral_target_job_id);
@@ -209,6 +230,68 @@ create table if not exists public.contact_job_referrals (
 create index if not exists contact_job_referrals_user_idx on public.contact_job_referrals (user_id);
 
 -- -----------------------------------------------------------------------------
+-- Super-resume — education, certifications, languages
+-- -----------------------------------------------------------------------------
+create table if not exists public.education_entries (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  school text not null,
+  degree text,
+  field_of_study text,
+  start_date date,
+  end_date date,
+  is_current boolean not null default false,
+  description text,
+  sort_order smallint not null default 0,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists education_entries_user_id_idx on public.education_entries (user_id);
+
+drop trigger if exists education_entries_set_updated_at on public.education_entries;
+create trigger education_entries_set_updated_at
+  before update on public.education_entries
+  for each row execute procedure public.set_updated_at();
+
+create table if not exists public.certification_entries (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  name text not null,
+  issuing_org text,
+  issue_date date,
+  expiration_date date,
+  credential_url text,
+  sort_order smallint not null default 0,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists certification_entries_user_id_idx on public.certification_entries (user_id);
+
+drop trigger if exists certification_entries_set_updated_at on public.certification_entries;
+create trigger certification_entries_set_updated_at
+  before update on public.certification_entries
+  for each row execute procedure public.set_updated_at();
+
+create table if not exists public.language_entries (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  name text not null,
+  proficiency text,
+  sort_order smallint not null default 0,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists language_entries_user_id_idx on public.language_entries (user_id);
+
+drop trigger if exists language_entries_set_updated_at on public.language_entries;
+create trigger language_entries_set_updated_at
+  before update on public.language_entries
+  for each row execute procedure public.set_updated_at();
+
+-- -----------------------------------------------------------------------------
 -- Row Level Security
 -- -----------------------------------------------------------------------------
 alter table public.profiles enable row level security;
@@ -220,6 +303,9 @@ alter table public.project_skills enable row level security;
 alter table public.bio_vault_messages enable row level security;
 alter table public.contacts enable row level security;
 alter table public.contact_job_referrals enable row level security;
+alter table public.education_entries enable row level security;
+alter table public.certification_entries enable row level security;
+alter table public.language_entries enable row level security;
 
 -- Idempotent policy refresh (re-run safe)
 do $$
@@ -232,7 +318,8 @@ begin
     where schemaname = 'public'
       and tablename in (
         'profiles', 'jobs', 'master_skills', 'experience_blocks', 'projects',
-        'project_skills', 'bio_vault_messages', 'contacts', 'contact_job_referrals'
+        'project_skills', 'bio_vault_messages', 'contacts', 'contact_job_referrals',
+        'education_entries', 'certification_entries', 'language_entries'
       )
   loop
     execute format(
@@ -245,6 +332,7 @@ end $$;
 
 -- Profiles
 create policy "profiles_select_own" on public.profiles for select using (auth.uid() = id);
+create policy "profiles_insert_own" on public.profiles for insert with check (auth.uid() = id);
 create policy "profiles_update_own" on public.profiles for update using (auth.uid() = id);
 
 -- Jobs
@@ -298,6 +386,22 @@ create policy "cjr_select_own" on public.contact_job_referrals for select using 
 create policy "cjr_insert_own" on public.contact_job_referrals for insert with check (auth.uid() = user_id);
 create policy "cjr_update_own" on public.contact_job_referrals for update using (auth.uid() = user_id);
 create policy "cjr_delete_own" on public.contact_job_referrals for delete using (auth.uid() = user_id);
+
+-- Education / certifications / languages
+create policy "education_select_own" on public.education_entries for select using (auth.uid() = user_id);
+create policy "education_insert_own" on public.education_entries for insert with check (auth.uid() = user_id);
+create policy "education_update_own" on public.education_entries for update using (auth.uid() = user_id);
+create policy "education_delete_own" on public.education_entries for delete using (auth.uid() = user_id);
+
+create policy "cert_select_own" on public.certification_entries for select using (auth.uid() = user_id);
+create policy "cert_insert_own" on public.certification_entries for insert with check (auth.uid() = user_id);
+create policy "cert_update_own" on public.certification_entries for update using (auth.uid() = user_id);
+create policy "cert_delete_own" on public.certification_entries for delete using (auth.uid() = user_id);
+
+create policy "lang_select_own" on public.language_entries for select using (auth.uid() = user_id);
+create policy "lang_insert_own" on public.language_entries for insert with check (auth.uid() = user_id);
+create policy "lang_update_own" on public.language_entries for update using (auth.uid() = user_id);
+create policy "lang_delete_own" on public.language_entries for delete using (auth.uid() = user_id);
 
 -- Dummy data + test auth user for Career-Hub AI
 -- Run AFTER schema.sql (or use provision_all.sql).

@@ -16,8 +16,8 @@ export default function LoginPage() {
             Welcome back
           </h1>
           <p className="mx-auto mt-2 max-w-md text-sm text-white/80">
-            After you sign in, dashboard metrics load from your Supabase data
-            (protected with RLS).
+            Sign in to open your dashboard. Your information stays private to
+            your account.
           </p>
         </header>
 

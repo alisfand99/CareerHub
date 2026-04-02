@@ -2,5 +2,6 @@ export function getGeminiApiKey(): string | undefined {
   return process.env.GEMINI_API_KEY;
 }
 
+/** Shown in the product UI when AI calls are blocked. */
 export const missingGeminiEnvMessage =
-  "GEMINI_API_KEY is not set. Add it to .env.local (server-only) to enable the AI orchestrator.";
+  "The career assistant isn’t enabled on this deployment yet. Ask your administrator to turn on the AI service, or continue using manual forms.";

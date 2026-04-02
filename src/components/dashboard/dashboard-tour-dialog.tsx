@@ -39,7 +39,8 @@ export function DashboardTourDialog({
         <ul className="space-y-3 text-sm text-muted-foreground">
           <li>
             <span className="font-medium text-foreground">Apply Hub</span> —
-            Kanban pipeline, JD capture, and AI gap analysis vs your vault.
+            Track applications from wishlist to offer, capture postings, and see
+            how you compare to what employers ask for.
           </li>
           <li>
             <span className="font-medium text-foreground">Bio-Vault</span> —
@@ -48,8 +49,8 @@ export function DashboardTourDialog({
           </li>
           <li>
             <span className="font-medium text-foreground">Network CRM</span> —
-            Strength-weighted contacts, influence indexing, and referral path
-            suggestions per target role.
+            Save people you know, note how strong the relationship is, and plan
+            warm intros toward roles you want.
           </li>
         </ul>
       </DialogContent>

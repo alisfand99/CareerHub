@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 
 function formatAuthError(err: unknown): string {
   if (err instanceof Error && err.message.includes("MISSING_SUPABASE_ENV")) {
-    return "Supabase is not configured. On Vercel: Settings → Environment Variables — set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY (or NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY), then Redeploy. Locally, use .env.local.";
+    return "Sign-in isn’t available yet because this app hasn’t finished setup. If you manage it, complete your hosting provider’s connection checklist, then publish again.";
   }
   if (err instanceof Error && err.message.length > 0) {
     return err.message;
@@ -68,7 +68,7 @@ export function LoginForm() {
         Sign in
       </h2>
       <p className="mt-1 text-sm text-slate-600">
-        Enter the email and password for your Supabase account.
+        Use the email and password you use for Career Hub.
       </p>
 
       <form onSubmit={onSubmit} className="mt-8 flex w-full flex-col gap-5">

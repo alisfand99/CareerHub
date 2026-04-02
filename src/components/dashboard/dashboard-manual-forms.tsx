@@ -110,8 +110,8 @@ export function AddJobDialog({
         <DialogHeader>
           <DialogTitle>Add job manually</DialogTitle>
           <DialogDescription>
-            Creates a wishlist card immediately. Use the orchestrator for JD
-            parsing and gap analysis.
+            Adds the role to your wishlist right away. Use the career assistant
+            if you want the posting parsed and compared to your skills.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={(e) => void submit(e)} className="grid gap-3">
@@ -136,7 +136,7 @@ export function AddJobDialog({
             />
           </div>
           <div className="grid gap-1.5">
-            <Label htmlFor="mj-jd">JD (optional)</Label>
+            <Label htmlFor="mj-jd">Job posting (optional)</Label>
             <textarea
               id="mj-jd"
               value={jd}
@@ -230,7 +230,7 @@ export function AddSkillDialog({
         <DialogHeader>
           <DialogTitle>Add skill manually</DialogTitle>
           <DialogDescription>
-            Indexed in your vault with manual provenance in metadata.
+            Saves straight into your Bio-Vault skill list.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={(e) => void submit(e)} className="grid gap-3">
@@ -287,6 +287,8 @@ export function AddContactDialog({
   const [fullName, setFullName] = useState("");
   const [company, setCompany] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [linkedinUrl, setLinkedinUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
@@ -312,6 +314,8 @@ export function AddContactDialog({
         full_name: fullName.trim(),
         company: company.trim() || null,
         email: email.trim() || null,
+        phone: phone.trim() || null,
+        linkedin_url: linkedinUrl.trim() || null,
         ai_expertise: { source: "manual_form" },
       });
       if (error) {
@@ -323,6 +327,8 @@ export function AddContactDialog({
       setFullName("");
       setCompany("");
       setEmail("");
+      setPhone("");
+      setLinkedinUrl("");
       router.refresh();
     } finally {
       setLoading(false);
@@ -345,8 +351,8 @@ export function AddContactDialog({
         <DialogHeader>
           <DialogTitle>Add contact manually</DialogTitle>
           <DialogDescription>
-            File a relationship for your CRM. Pair with orchestrator outreach
-            drafts later.
+            Keep track of someone in your network. You can ask the assistant
+            later to help draft a message.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={(e) => void submit(e)} className="grid gap-3">
@@ -374,6 +380,26 @@ export function AddContactDialog({
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          <div className="grid gap-1.5">
+            <Label htmlFor="ct-ph">Phone (optional)</Label>
+            <Input
+              id="ct-ph"
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="+1 …"
+            />
+          </div>
+          <div className="grid gap-1.5">
+            <Label htmlFor="ct-li">LinkedIn URL (optional)</Label>
+            <Input
+              id="ct-li"
+              type="url"
+              value={linkedinUrl}
+              onChange={(e) => setLinkedinUrl(e.target.value)}
+              placeholder="https://www.linkedin.com/in/…"
             />
           </div>
           {err ? <p className="text-xs text-destructive">{err}</p> : null}

@@ -11,6 +11,7 @@ import {
   Star,
   Target,
   TrendingUp,
+  Users,
 } from "lucide-react";
 import type { JobRow } from "@/lib/queries/jobs";
 import {
@@ -103,7 +104,7 @@ function SkillBarsChart({ skills }: { skills: { name: string; filled: boolean }[
   if (slice.length === 0) {
     return (
       <p className="py-8 text-center text-sm text-zinc-500">
-        Run JD intelligence in the orchestrator to chart required skills.
+        Use the career assistant on a saved posting to chart required skills.
       </p>
     );
   }
@@ -156,7 +157,13 @@ const STATUS_LABEL: Record<string, string> = {
   offer: "Offer",
 };
 
-export function JobCommandDeck({ job }: { job: JobRow }) {
+export function JobCommandDeck({
+  job,
+  companyConnections = [],
+}: {
+  job: JobRow;
+  companyConnections?: { id: string; full_name: string }[];
+}) {
   const intel = parseJobIntel(job);
   const pipeline = jobPipelineProgress(job.status);
   const rank = jobStatusRank(job.status);
@@ -256,7 +263,7 @@ export function JobCommandDeck({ job }: { job: JobRow }) {
           </h2>
           <MatchDonut percent={match} />
           <p className="mt-3 text-center text-xs text-zinc-500">
-            Score from orchestrator vs your Bio-Vault skills.
+            How well your Bio-Vault skills align with this role.
           </p>
           <div className="mt-4 flex flex-wrap justify-center gap-2 border-t border-fuchsia-500/15 pt-4">
             {Array.from({ length: perkCount }).map((_, i) => (
@@ -288,7 +295,7 @@ export function JobCommandDeck({ job }: { job: JobRow }) {
               : intel.stretchSkills
             ).length === 0 ? (
               <li className="text-sm text-zinc-500">
-                No skill list yet — paste a JD into the orchestrator.
+                No skill list yet — add the job posting through the assistant.
               </li>
             ) : (
               (intel.requiredSkills.length
@@ -330,7 +337,7 @@ export function JobCommandDeck({ job }: { job: JobRow }) {
             Requirement signal
           </h2>
           <p className="mb-2 text-xs text-zinc-500">
-            Taller bars = already reflected in your vault.
+            Taller bars mean the skill is already in your Bio-Vault.
           </p>
           <SkillBarsChart skills={chartSkills} />
         </div>
@@ -363,7 +370,7 @@ export function JobCommandDeck({ job }: { job: JobRow }) {
                       colSpan={3}
                       className="px-3 py-6 text-center text-zinc-500"
                     >
-                      No gap rows yet. Ingest a JD to populate insights.
+                      No insights yet. Add a job posting through the assistant.
                     </td>
                   </tr>
                 ) : (
@@ -409,7 +416,32 @@ export function JobCommandDeck({ job }: { job: JobRow }) {
           </div>
         </div>
 
-        {/* JD */}
+        {companyConnections.length > 0 ? (
+          <div className={cn(PANEL, "lg:col-span-12")}>
+            <h2 className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-fuchsia-300/90">
+              <Users className="size-4 text-fuchsia-400" aria-hidden />
+              Connections at this company
+            </h2>
+            <p className="mb-3 text-xs text-zinc-500">
+              People in your network list who work at{" "}
+              <span className="text-zinc-400">{job.company}</span>. Tap a name to
+              open their saved profile and contact options.
+            </p>
+            <ul className="flex flex-wrap gap-2">
+              {companyConnections.map((c) => (
+                <li key={c.id}>
+                  <Link
+                    href={`/network#c-${c.id}`}
+                    className="inline-flex items-center rounded-full border border-fuchsia-500/35 bg-zinc-900/90 px-3 py-1.5 text-sm font-medium text-fuchsia-100 shadow-[0_0_12px_rgba(192,38,211,0.2)] transition hover:border-fuchsia-400/55 hover:text-white"
+                  >
+                    {c.full_name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+
         <div className={cn(PANEL, "lg:col-span-12")}>
           <h2 className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-fuchsia-300/90">
             <BookOpen className="size-4" aria-hidden />
@@ -421,7 +453,7 @@ export function JobCommandDeck({ job }: { job: JobRow }) {
             </div>
           ) : (
             <p className="text-sm text-zinc-500">
-              No JD text stored for this role yet.
+              No posting text saved for this role yet.
             </p>
           )}
         </div>

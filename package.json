@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "node scripts/clean-next.mjs && next dev -p 3005",
-    "dev:fast": "next dev -p 3005",
-    "dev:clean": "node scripts/clean-next.mjs && next dev -p 3005",
+    "clean": "node scripts/clean.mjs",
+    "dev": "next dev -p 3005",
+    "dev:clean": "npm run clean && next dev -p 3005",
     "presentation:capture": "node scripts/capture-presentation.mjs",
     "build": "next build",
     "start": "next start",
@@ -46,6 +46,7 @@
     "eslint-config-next": "14.2.35",
     "pg": "^8.20.0",
     "postcss": "^8",
+    "shadcn": "^4.1.2",
     "tailwindcss": "^3.4.1",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "^5"

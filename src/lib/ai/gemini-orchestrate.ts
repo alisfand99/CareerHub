@@ -2,6 +2,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getGeminiApiKey } from "@/lib/ai/env";
 import { generateContentWithModelFallback } from "@/lib/ai/gemini-run";
 import { buildOrchestratorSystemPrompt } from "@/lib/ai/orchestrator-prompt";
+import { normalizeOrchestratorPayload } from "@/lib/ai/orchestrator-normalize";
 import {
   OrchestratorPlanSchema,
   type OrchestratorPlan,
@@ -36,7 +37,7 @@ export async function generateOrchestratorPlan(
     {
       generationConfig: {
         temperature: 0.25,
-        maxOutputTokens: 8192,
+        maxOutputTokens: 16384,
         responseMimeType: "application/json",
       },
     },
@@ -59,16 +60,23 @@ export async function generateOrchestratorPlan(
     return {
       intent: "general",
       assistant_message:
-        "I could not parse a structured plan from the model. Try rephrasing, or paste a shorter JD chunk.",
+        "I couldn’t follow that request. Try shorter text or paste a smaller part of the job posting.",
     };
   }
 
-  const safe = OrchestratorPlanSchema.safeParse(parsed);
+  const normalized = normalizeOrchestratorPayload(parsed);
+  const safe = OrchestratorPlanSchema.safeParse(normalized);
   if (!safe.success) {
+    if (process.env.NODE_ENV === "development") {
+      console.warn(
+        "[orchestrator] JSON failed validation:",
+        safe.error.flatten(),
+      );
+    }
     return {
       intent: "general",
       assistant_message:
-        "The model returned an unexpected shape. Please try again with a clearer request (JD, skill update, contact, or outreach).",
+        "Something went wrong interpreting that message. Try again with a clear ask—job posting, skill update, contact, or outreach.",
     };
   }
 

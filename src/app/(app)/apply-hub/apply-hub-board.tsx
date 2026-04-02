@@ -1,9 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useId } from "react";
-import { Briefcase, Loader2 } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { useId, useState } from "react";
+import { Briefcase, Loader2, Trash2 } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
+import { AddJobDialog } from "@/components/dashboard/dashboard-manual-forms";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -86,10 +89,33 @@ function MatchGauge({ score }: { score: number }) {
 }
 
 export function ApplyHubBoard({ initialJobs }: { initialJobs: JobRow[] }) {
+  const router = useRouter();
   const pathname = usePathname();
   const { busy } = useOrchestrator();
   const onApplyHub = pathname.startsWith("/apply-hub");
   const showPipelinePulse = busy && onApplyHub;
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  async function removeJob(jobId: string, title: string) {
+    if (
+      typeof window !== "undefined" &&
+      !window.confirm(`Remove “${title}” from your pipeline?`)
+    ) {
+      return;
+    }
+    setDeletingId(jobId);
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.from("jobs").delete().eq("id", jobId);
+      if (error) {
+        window.alert(error.message);
+        return;
+      }
+      router.refresh();
+    } finally {
+      setDeletingId(null);
+    }
+  }
 
   const byStatus = STATUSES.map((s) => ({
     status: s,
@@ -98,14 +124,15 @@ export function ApplyHubBoard({ initialJobs }: { initialJobs: JobRow[] }) {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Apply Hub</h1>
-        <p className="text-sm text-muted-foreground">
-          Kanban backed by Supabase{" "}
-          <code className="rounded bg-muted px-1 py-0.5 text-xs">jobs</code>.
-          When the AI orchestrator ingests a JD, cards appear here and gap
-          analysis flows to Bio-Vault market insights.
-        </p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Apply Hub</h1>
+          <p className="text-sm text-muted-foreground">
+            Track roles from wishlist to offer. Add a posting with the career
+            assistant to see match scores and market insights in Bio-Vault.
+          </p>
+        </div>
+        <AddJobDialog />
       </div>
 
       <div
@@ -122,7 +149,7 @@ export function ApplyHubBoard({ initialJobs }: { initialJobs: JobRow[] }) {
           >
             <div className="flex items-center gap-2 rounded-full border border-primary/30 bg-background/95 px-4 py-2 text-sm font-medium text-primary shadow-lg">
               <Loader2 className="size-4 animate-spin" />
-              Orchestrator is updating your pipeline…
+              Updating your pipeline…
             </div>
           </div>
         ) : null}
@@ -145,12 +172,12 @@ export function ApplyHubBoard({ initialJobs }: { initialJobs: JobRow[] }) {
             </div>
             <ul className="flex flex-1 flex-col gap-2 overflow-y-auto">
               {jobs.map((job) => (
-                <li key={job.id}>
+                <li key={job.id} className="flex gap-1">
                   <Link
                     href={`/apply-hub/jobs/${job.id}`}
-                    className="block rounded-lg outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-primary"
+                    className="min-w-0 flex-1 rounded-lg outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-primary"
                   >
-                    <Card className="border-border/70 bg-background/80 shadow-none transition-colors hover:border-primary/35 hover:bg-background">
+                    <Card className="h-full border-border/70 bg-background/80 shadow-none transition-colors hover:border-primary/35 hover:bg-background">
                       <CardHeader className="space-y-1 p-3 pb-2">
                         <CardTitle className="text-sm leading-snug">
                           {job.title}
@@ -164,12 +191,27 @@ export function ApplyHubBoard({ initialJobs }: { initialJobs: JobRow[] }) {
                           <MatchGauge score={Number(job.ai_match_score)} />
                         ) : (
                           <p className="text-xs text-muted-foreground">
-                            Open the orchestrator to run JD intelligence.
+                            Open the assistant to analyze this posting.
                           </p>
                         )}
                       </CardContent>
                     </Card>
                   </Link>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-xs"
+                    className="mt-1 shrink-0 self-start text-muted-foreground hover:text-destructive"
+                    aria-label={`Remove ${job.title}`}
+                    disabled={deletingId === job.id}
+                    onClick={() => void removeJob(job.id, job.title)}
+                  >
+                    {deletingId === job.id ? (
+                      <Loader2 className="size-4 animate-spin" aria-hidden />
+                    ) : (
+                      <Trash2 className="size-4" aria-hidden />
+                    )}
+                  </Button>
                 </li>
               ))}
               {jobs.length === 0 ? (

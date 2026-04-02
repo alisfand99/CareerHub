@@ -45,7 +45,7 @@ export async function POST(req: Request) {
     supabase = await createClient();
   } catch {
     return NextResponse.json(
-      { error: "Supabase is not configured on the server." },
+      { error: "This workspace is not fully set up yet. Try again later or contact support." },
       { status: 503 },
     );
   }

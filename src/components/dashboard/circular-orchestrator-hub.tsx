@@ -353,7 +353,7 @@ export function CircularOrchestratorHub({
               <PillarMindCard
                 href="/apply-hub"
                 title="Apply Hub"
-                subtitle="Pipeline · JD intelligence"
+                subtitle="Pipeline · posting insights"
                 count={applyCount}
                 icon={Briefcase}
                 highlight={applyActive}

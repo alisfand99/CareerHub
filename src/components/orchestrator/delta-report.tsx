@@ -72,7 +72,42 @@ export function DeltaReport({
   if (delta.bioVaultLogs && delta.bioVaultLogs > 0) {
     rows.push({
       label: "Resume",
-      value: "Canonical draft updated",
+      value: "Résumé draft updated",
+      positive: true,
+    });
+  }
+  if (delta.profileUpdated) {
+    rows.push({
+      label: "Profile",
+      value: "Updated",
+      positive: true,
+    });
+  }
+  if (delta.educationAdded && delta.educationAdded > 0) {
+    rows.push({
+      label: "Education",
+      value: `+${delta.educationAdded}`,
+      positive: true,
+    });
+  }
+  if (delta.certificationsAdded && delta.certificationsAdded > 0) {
+    rows.push({
+      label: "Certificates",
+      value: `+${delta.certificationsAdded}`,
+      positive: true,
+    });
+  }
+  if (delta.languagesAdded && delta.languagesAdded > 0) {
+    rows.push({
+      label: "Languages",
+      value: `+${delta.languagesAdded}`,
+      positive: true,
+    });
+  }
+  if (delta.projectsAdded && delta.projectsAdded > 0) {
+    rows.push({
+      label: "Projects",
+      value: `+${delta.projectsAdded}`,
       positive: true,
     });
   }

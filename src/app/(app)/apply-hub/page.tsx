@@ -5,15 +5,14 @@ import { fetchUserJobs } from "@/lib/queries/jobs";
 import { ApplyHubBoard } from "./apply-hub-board";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { cn } from "@/lib/utils";
+import { workspaceNotReady } from "@/lib/user-facing-copy";
 
 export default async function ApplyHubPage() {
   if (!isSupabaseConfigured()) {
     return (
       <div className="mx-auto max-w-lg space-y-4 text-center">
         <h1 className="text-2xl font-semibold">Apply Hub</h1>
-        <p className="text-sm text-muted-foreground">
-          Configure Supabase environment variables to load your pipeline.
-        </p>
+        <p className="text-sm text-muted-foreground">{workspaceNotReady}</p>
       </div>
     );
   }

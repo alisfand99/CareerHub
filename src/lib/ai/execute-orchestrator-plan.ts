@@ -20,6 +20,19 @@ export type OrchestratorExecutionResult = {
   delta?: OrchestratorDelta;
 };
 
+function parseIsoDate(s: string | undefined): string | null {
+  if (!s?.trim()) return null;
+  const t = s.trim();
+  return /^\d{4}-\d{2}-\d{2}$/.test(t) ? t : null;
+}
+
+function experienceBlockCount(plan: OrchestratorPlan): number {
+  const fromList =
+    plan.experiences?.filter((e) => e.title?.trim()).length ?? 0;
+  if (fromList > 0) return fromList;
+  return plan.experience?.title?.trim() ? 1 : 0;
+}
+
 function computeDelta(
   plan: OrchestratorPlan,
   updated_tables: string[],
@@ -36,7 +49,7 @@ function computeDelta(
     any = true;
   }
   if (updated_tables.includes("experience_blocks")) {
-    d.experienceBlocks = 1;
+    d.experienceBlocks = experienceBlockCount(plan) || 1;
     any = true;
   }
   if (updated_tables.includes("contacts")) {
@@ -48,6 +61,29 @@ function computeDelta(
     plan.resume_refactor_markdown?.trim()
   ) {
     d.bioVaultLogs = 1;
+    any = true;
+  }
+  if (updated_tables.includes("profiles")) {
+    d.profileUpdated = true;
+    any = true;
+  }
+  if (updated_tables.includes("education_entries") && plan.education?.length) {
+    d.educationAdded = plan.education.length;
+    any = true;
+  }
+  if (
+    updated_tables.includes("certification_entries") &&
+    plan.certifications?.length
+  ) {
+    d.certificationsAdded = plan.certifications.length;
+    any = true;
+  }
+  if (updated_tables.includes("language_entries") && plan.languages?.length) {
+    d.languagesAdded = plan.languages.length;
+    any = true;
+  }
+  if (updated_tables.includes("projects") && plan.projects?.length) {
+    d.projectsAdded = plan.projects.length;
     any = true;
   }
   if (plan.intent === "outreach_generation" && outreach?.message) {
@@ -292,22 +328,153 @@ export async function executeOrchestratorPlan(
           updated_tables.push("master_skills");
         }
 
-        if (plan.experience?.title) {
+        const experienceItems =
+          plan.experiences && plan.experiences.length > 0
+            ? plan.experiences.filter((e) => e.title?.trim())
+            : plan.experience?.title?.trim()
+              ? [plan.experience]
+              : [];
+
+        let firstExpId: string | undefined;
+        for (const ex of experienceItems) {
+          const isCurrent = Boolean(ex.is_current);
           const { data: exp, error } = await supabase
             .from("experience_blocks")
             .insert({
               user_id: userId,
-              title: plan.experience.title.trim(),
-              organization: plan.experience.organization ?? null,
-              bullets: plan.experience.bullets ?? [],
+              title: ex.title.trim(),
+              organization: ex.organization?.trim() ?? null,
+              location: ex.location?.trim() ?? null,
+              start_date: parseIsoDate(ex.start_date),
+              end_date: isCurrent ? null : parseIsoDate(ex.end_date),
+              is_current: isCurrent,
+              bullets: ex.bullets ?? [],
               raw_ingest:
-                plan.experience.raw_ingest ?? userMessage.slice(0, 8000),
+                ex.raw_ingest?.trim() ??
+                userMessage.slice(0, 8000),
             })
             .select("id")
             .single();
           if (error) throw error;
-          updated_tables.push("experience_blocks");
-          if (exp?.id) record_ids.experience_id = exp.id;
+          if (!updated_tables.includes("experience_blocks")) {
+            updated_tables.push("experience_blocks");
+          }
+          if (exp?.id && !firstExpId) firstExpId = exp.id;
+        }
+        if (firstExpId) record_ids.experience_id = firstExpId;
+
+        if (plan.profile) {
+          const allowed = [
+            "display_name",
+            "headline",
+            "summary",
+            "phone",
+            "location",
+            "website",
+            "public_email",
+          ] as const;
+          const clean: Record<string, string> = {};
+          for (const key of allowed) {
+            const v = plan.profile[key];
+            if (typeof v === "string" && v.trim()) clean[key] = v.trim();
+          }
+          if (Object.keys(clean).length > 0) {
+            const { data: exists } = await supabase
+              .from("profiles")
+              .select("id")
+              .eq("id", userId)
+              .maybeSingle();
+            if (exists?.id) {
+              const { error: pe } = await supabase
+                .from("profiles")
+                .update(clean)
+                .eq("id", userId);
+              if (pe) throw pe;
+            } else {
+              const { error: pi } = await supabase
+                .from("profiles")
+                .insert({ id: userId, ...clean });
+              if (pi) throw pi;
+            }
+            updated_tables.push("profiles");
+          }
+        }
+
+        if (plan.education?.length) {
+          let eduInserted = 0;
+          for (const ed of plan.education) {
+            const school = ed.school?.trim();
+            if (!school) continue;
+            const cur = Boolean(ed.is_current);
+            const { error: edErr } = await supabase.from("education_entries").insert({
+              user_id: userId,
+              school,
+              degree: ed.degree?.trim() || null,
+              field_of_study: ed.field_of_study?.trim() || null,
+              start_date: parseIsoDate(ed.start_date),
+              end_date: cur ? null : parseIsoDate(ed.end_date),
+              is_current: cur,
+              description: ed.description?.trim() || null,
+            });
+            if (edErr) throw edErr;
+            eduInserted += 1;
+          }
+          if (eduInserted > 0) updated_tables.push("education_entries");
+        }
+
+        if (plan.certifications?.length) {
+          let certInserted = 0;
+          for (const c of plan.certifications) {
+            const name = c.name?.trim();
+            if (!name) continue;
+            const { error: cErr } = await supabase
+              .from("certification_entries")
+              .insert({
+                user_id: userId,
+                name,
+                issuing_org: c.issuing_org?.trim() || null,
+                issue_date: parseIsoDate(c.issue_date),
+                expiration_date: parseIsoDate(c.expiration_date),
+                credential_url: c.credential_url?.trim() || null,
+              });
+            if (cErr) throw cErr;
+            certInserted += 1;
+          }
+          if (certInserted > 0) updated_tables.push("certification_entries");
+        }
+
+        if (plan.languages?.length) {
+          let langInserted = 0;
+          for (const lang of plan.languages) {
+            const name = lang.name?.trim();
+            if (!name) continue;
+            const { error: lErr } = await supabase.from("language_entries").insert({
+              user_id: userId,
+              name,
+              proficiency: lang.proficiency?.trim() || null,
+            });
+            if (lErr) throw lErr;
+            langInserted += 1;
+          }
+          if (langInserted > 0) updated_tables.push("language_entries");
+        }
+
+        if (plan.projects?.length) {
+          let projInserted = 0;
+          for (const pr of plan.projects) {
+            const name = pr.name?.trim();
+            if (!name) continue;
+            const { error: prErr } = await supabase.from("projects").insert({
+              user_id: userId,
+              name,
+              summary: pr.summary?.trim() || null,
+              tech_stack: pr.tech_stack ?? [],
+              url: pr.url?.trim() || null,
+            });
+            if (prErr) throw prErr;
+            projInserted += 1;
+          }
+          if (projInserted > 0) updated_tables.push("projects");
         }
 
         if (plan.resume_refactor_markdown?.trim()) {

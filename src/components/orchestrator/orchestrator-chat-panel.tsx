@@ -15,14 +15,23 @@ const QUICK_ACTIONS = [
     label: "➕ Found a Job",
     fill: (cur: string) =>
       cur.trim()
-        ? `${cur}\n\nI found a new job at [Company]. Here is the JD:\n\n`
-        : "I found a new job at [Company]. Here is the JD:\n\n",
+        ? `${cur}\n\nI found a new job at [Company]. Here is the posting:\n\n`
+        : "I found a new job at [Company]. Here is the posting:\n\n",
+  },
+  {
+    id: "ingest",
+    label: "📄 Import résumé",
+    fill: (cur: string) => {
+      const head =
+        "Please extract everything from this résumé or profile into my Bio-Vault: all roles, skills, education, certifications, languages, and projects, plus headline and summary if present.\n\n";
+      return cur.trim() ? `${head}${cur}` : head;
+    },
   },
   {
     id: "resume",
     label: "🚀 Refactor Resume",
     fill: () =>
-      "Analyze my latest Bio-Vault entries and update my master resume markdown.",
+      "Analyze my latest Bio-Vault entries and update my résumé draft.",
   },
   {
     id: "outreach",
@@ -62,13 +71,19 @@ export function OrchestratorChatPanel() {
   const contextHint =
     pathname.startsWith("/apply-hub") ? (
       <p className="rounded-md border border-primary/20 bg-primary/5 px-3 py-2 text-xs text-foreground">
-        <span className="font-medium">Tip:</span> Found a JD? Click{" "}
+        <span className="font-medium">Tip:</span> Found a role? Click{" "}
         <strong>Found a Job</strong>, then paste the posting below.
       </p>
     ) : pathname.startsWith("/network") ? (
       <p className="rounded-md border border-primary/20 bg-primary/5 px-3 py-2 text-xs text-foreground">
         <span className="font-medium">Tip:</span> Ready to connect? Try{" "}
         <strong>Outreach Script</strong> for a tailored draft.
+      </p>
+    ) : pathname.startsWith("/bio-vault") ? (
+      <p className="rounded-md border border-primary/20 bg-primary/5 px-3 py-2 text-xs text-foreground">
+        <span className="font-medium">Tip:</span> Pasting a full CV? Click{" "}
+        <strong>Import résumé</strong>, then paste your text — or paste
+        directly; long profile text is treated as a Bio-Vault import.
       </p>
     ) : null;
 
@@ -88,10 +103,10 @@ export function OrchestratorChatPanel() {
             </div>
             <div>
               <p className="text-sm font-semibold tracking-tight">
-                Command interface
+                Career assistant
               </p>
               <p className="text-xs text-muted-foreground">
-                Strategic orchestration · Apply · Vault · Network
+                Jobs · Bio-Vault · Network
               </p>
             </div>
           </div>
@@ -120,15 +135,14 @@ export function OrchestratorChatPanel() {
         <ScrollArea className="min-h-0 flex-1 px-3 py-3">
           {messages.length === 0 ? (
             <div className="space-y-3 rounded-lg border border-dashed border-border/80 bg-muted/20 p-4 text-sm text-muted-foreground">
-              <p className="font-medium text-foreground">Central command</p>
+              <p className="font-medium text-foreground">How to use it</p>
               <p>
-                Use quick actions below or free-form text. The orchestrator
-                classifies intent, writes to Supabase, and returns a delta
-                report when data changes.
+                Pick a shortcut or type freely. The assistant updates your
+                pipeline, skills, and contacts when it recognizes a request, and
+                shows a short summary of what changed.
               </p>
               <p className="text-xs">
-                Server requires{" "}
-                <code className="rounded bg-muted px-1">GEMINI_API_KEY</code>.
+                Smart replies need the AI service enabled for this deployment.
               </p>
             </div>
           ) : (
@@ -216,7 +230,7 @@ export function OrchestratorChatPanel() {
             rows={3}
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Paste a JD, add skills, or ask for outreach…"
+            placeholder="Paste a job posting, add skills, or ask for outreach…"
             disabled={busy}
             className="mb-2 w-full resize-none rounded-md border border-input bg-background px-3 py-2 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
           />
@@ -233,7 +247,7 @@ export function OrchestratorChatPanel() {
             ) : (
               <>
                 <Send className="size-4" />
-                Execute
+                Send
               </>
             )}
           </Button>

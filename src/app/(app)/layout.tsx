@@ -1,22 +1,13 @@
-import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { OrchestratorShell } from "@/components/orchestrator/orchestrator-shell";
+import { getCachedUserEmail } from "@/lib/auth/cached-session";
 
 export default async function AppLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  let userEmail: string | null = null;
-  try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    userEmail = user?.email ?? null;
-  } catch {
-    userEmail = null;
-  }
+  const userEmail = await getCachedUserEmail();
 
   return (
     <OrchestratorShell>

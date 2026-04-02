@@ -42,11 +42,11 @@ export default function AppError({
     <div className="mx-auto flex min-h-[50vh] max-w-lg flex-col items-center justify-center gap-6 px-6 py-16 text-center">
       <div className="space-y-2">
         <h1 className="text-lg font-semibold tracking-tight text-foreground">
-          {chunk ? "Updating app bundle…" : "Something went wrong"}
+          {chunk ? "Refreshing…" : "Something went wrong"}
         </h1>
         <p className="text-sm text-muted-foreground">
           {chunk
-            ? "Your dev server replaced a JavaScript chunk. The page will reload automatically. If the overlay returns, stop every other Next terminal, then run npm run dev once."
+            ? "A new version of the page is loading. This tab should reload on its own. If it keeps looping, close other tabs for this site and try again."
             : error.message || "An unexpected error occurred."}
         </p>
       </div>

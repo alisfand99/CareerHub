@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { Sparkles } from "lucide-react";
 import { useOrchestrator } from "@/components/orchestrator/orchestrator-context";
 import { cn } from "@/lib/utils";
@@ -13,6 +13,8 @@ export function OrchestratorFloatingCore() {
   const pathname = usePathname();
   const { open, setOpen, isPulsing } = useOrchestrator();
   const onDashboard = pathname === "/";
+  const reduceMotion = useReducedMotion();
+  const pulse = reduceMotion ? false : isPulsing;
 
   if (onDashboard) return null;
 
@@ -21,24 +23,24 @@ export function OrchestratorFloatingCore() {
       type="button"
       onClick={() => setOpen(true)}
       className={cn(
-        "fixed bottom-6 right-6 z-40 flex size-[3.75rem] items-center justify-center rounded-full md:bottom-8 md:right-8 md:size-16",
+        "fixed bottom-6 right-6 z-40 flex size-[3.75rem] transform-gpu items-center justify-center rounded-full will-change-transform md:bottom-8 md:right-8 md:size-16",
         "border-0 bg-transparent shadow-[0_0_40px_-6px_rgba(34,211,238,0.45),0_0_60px_-8px_rgba(168,85,247,0.25)]",
         "outline-none ring-offset-[#050508] focus-visible:ring-2 focus-visible:ring-cyan-400/70",
         open && "pointer-events-none scale-90 opacity-0",
       )}
-      aria-label="Open neural command interface"
-      animate={{ scale: isPulsing ? 1.06 : 1 }}
+      aria-label="Open career assistant"
+      animate={{ scale: pulse ? 1.06 : 1 }}
       transition={{ type: "spring", stiffness: 400, damping: 22 }}
     >
       <motion.span
-        className="absolute inset-[-8%] rounded-full bg-[radial-gradient(circle,rgba(34,211,238,0.35)_0%,rgba(168,85,247,0.15)_45%,transparent_70%)] blur-md"
+        className="absolute inset-[-8%] transform-gpu rounded-full bg-[radial-gradient(circle,rgba(34,211,238,0.35)_0%,rgba(168,85,247,0.15)_45%,transparent_70%)] blur-md will-change-transform"
         animate={{
-          opacity: isPulsing ? [0.7, 1, 0.7] : 0.85,
-          scale: isPulsing ? [1, 1.1, 1] : 1,
+          opacity: pulse ? [0.7, 1, 0.7] : 0.85,
+          scale: pulse ? [1, 1.1, 1] : 1,
         }}
         transition={{
-          duration: isPulsing ? 1.35 : 0,
-          repeat: isPulsing ? Infinity : 0,
+          duration: pulse ? 1.35 : 0,
+          repeat: pulse ? Infinity : 0,
           ease: "easeInOut",
         }}
         aria-hidden

@@ -196,7 +196,7 @@ export function AppShell({
               orchestratorPulsing &&
                 "shadow-[0_0_16px_rgba(0,86,210,0.35)] ring-2 ring-primary/40",
             )}
-            aria-label="Open AI orchestrator"
+            aria-label="Open career assistant"
             onClick={() => setOpen(true)}
           >
             <MessageSquare
@@ -235,10 +235,10 @@ export function AppShell({
                   orchestratorPulsing && "animate-pulse",
                 )}
               />
-              Orchestrator
+              Assistant
             </Button>
             <span className="hidden text-xs text-muted-foreground lg:inline">
-              Row-level security enabled
+              Private workspace
             </span>
             {userEmail ? (
               <span
@@ -319,7 +319,7 @@ export function AppShell({
             <div className="mx-auto flex max-w-6xl flex-col gap-1 px-6 py-4 text-xs text-white/45 md:flex-row md:items-center md:justify-between md:px-8">
               <span>© {year} Career-Hub AI. All rights reserved.</span>
               <span className="text-white/35">
-                Dashboard data is sourced from your Supabase project.
+                Your data is saved to your private workspace.
               </span>
             </div>
           </div>

@@ -26,6 +26,11 @@ import {
 } from "@/components/ui/table";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { cn } from "@/lib/utils";
+import {
+  dataLoadFailed,
+  firstTimeSetupHint,
+  workspaceNotReady,
+} from "@/lib/user-facing-copy";
 
 const jobLabels: Record<string, string> = {
   wishlist: "Wishlist",
@@ -54,8 +59,7 @@ export default async function DashboardPage() {
         loadError = result.error;
       }
     } catch {
-      loadError =
-        "Unable to reach Supabase. Check keys and that the project is running.";
+      loadError = dataLoadFailed;
     }
   }
 
@@ -73,25 +77,8 @@ export default async function DashboardPage() {
       {!configured ? (
         <Card className="border-amber-500/40 bg-amber-500/5 shadow-md">
           <CardHeader>
-            <CardTitle className="text-base">Configure Supabase</CardTitle>
-            <CardDescription>
-              On Vercel (or your host):{" "}
-              <strong className="text-foreground">Settings → Environment Variables</strong>{" "}
-              — add{" "}
-              <code className="rounded bg-muted px-1 py-0.5 text-xs">
-                NEXT_PUBLIC_SUPABASE_URL
-              </code>{" "}
-              and{" "}
-              <code className="rounded bg-muted px-1 py-0.5 text-xs">
-                NEXT_PUBLIC_SUPABASE_ANON_KEY
-              </code>{" "}
-              (or{" "}
-              <code className="rounded bg-muted px-1 py-0.5 text-xs">
-                NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY
-              </code>
-              ), then <strong className="text-foreground">Redeploy</strong>. Locally use{" "}
-              <code className="rounded bg-muted px-1 py-0.5 text-xs">.env.local</code>.
-            </CardDescription>
+            <CardTitle className="text-base">Setup required</CardTitle>
+            <CardDescription>{workspaceNotReady}</CardDescription>
           </CardHeader>
         </Card>
       ) : null}
@@ -115,13 +102,7 @@ export default async function DashboardPage() {
             <CardDescription>{loadError}</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground">
-              If tables are missing, open the Supabase SQL Editor and execute{" "}
-              <code className="rounded bg-muted px-1 py-0.5 text-xs">
-                supabase/schema.sql
-              </code>
-              .
-            </p>
+            <p className="text-sm text-muted-foreground">{firstTimeSetupHint}</p>
           </CardContent>
         </Card>
       ) : null}
@@ -131,7 +112,7 @@ export default async function DashboardPage() {
           <CardHeader>
             <CardTitle className="text-base">Sign in to load your data</CardTitle>
             <CardDescription>
-              Row Level Security keeps each workspace private to your account.
+              Your jobs and profile are visible only after you sign in.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -171,11 +152,8 @@ export default async function DashboardPage() {
                   <CardTitle className="text-base">Pipeline load</CardTitle>
                 </div>
                 <CardDescription>
-                  Visual distribution across Kanban stages (live{" "}
-                  <code className="rounded bg-muted px-1 py-0.5 text-[0.65rem]">
-                    jobs
-                  </code>{" "}
-                  counts).
+                  How your applications are spread across each stage in your
+                  pipeline.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -206,7 +184,7 @@ export default async function DashboardPage() {
               <CardHeader>
                 <CardTitle className="text-base">Pipeline distribution</CardTitle>
                 <CardDescription>
-                  Kanban columns map to live counts in your database.
+                  Counts update when you add roles or move them between stages.
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -240,19 +218,7 @@ export default async function DashboardPage() {
             <CardHeader>
               <CardTitle className="text-base">Skill engine depth</CardTitle>
               <CardDescription>
-                Structured rows in{" "}
-                <code className="rounded bg-muted px-1 py-0.5 text-xs">
-                  master_skills
-                </code>
-                ,{" "}
-                <code className="rounded bg-muted px-1 py-0.5 text-xs">
-                  projects
-                </code>
-                , and{" "}
-                <code className="rounded bg-muted px-1 py-0.5 text-xs">
-                  experience_blocks
-                </code>
-                .
+                Skills, projects, and work history you’ve saved in Bio-Vault.
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4 sm:grid-cols-2">
@@ -262,10 +228,7 @@ export default async function DashboardPage() {
                   {stats.bioMessagesCount}
                 </p>
                 <p className="mt-2 text-xs text-muted-foreground">
-                  Chat-style intake in{" "}
-                  <code className="rounded bg-muted px-1 py-0.5 text-[0.65rem]">
-                    bio_vault_messages
-                  </code>
+                  Conversations you’ve had with the career assistant.
                 </p>
               </div>
               <div className="rounded-lg border border-border/70 bg-gradient-to-br from-card to-muted/20 p-5 shadow-sm">
@@ -274,7 +237,7 @@ export default async function DashboardPage() {
                   {stats.skillsCount + stats.projectsCount + stats.experienceCount}
                 </p>
                 <p className="mt-2 text-xs text-muted-foreground">
-                  Feeds tailored resumes and JD gap analysis.
+                  Powers tailored résumés and job fit insights.
                 </p>
               </div>
             </CardContent>
@@ -304,10 +267,7 @@ export default async function DashboardPage() {
                   {stats.referralLinksCount}
                 </p>
                 <p className="mt-2 text-xs text-muted-foreground">
-                  Rows in{" "}
-                  <code className="rounded bg-muted px-1 py-0.5 text-[0.65rem]">
-                    contact_job_referrals
-                  </code>
+                  Links between people and the roles you’re pursuing.
                 </p>
               </div>
             </CardContent>

@@ -2,6 +2,7 @@
 
 import {
   createContext,
+  startTransition,
   useCallback,
   useContext,
   useMemo,
@@ -13,6 +14,7 @@ import { useRouter } from "next/navigation";
 import {
   guessFlowTargetFromMessage,
   intentToFlowTarget,
+  orchestratorDeltaNeedsRscRefresh,
   type FlowTarget,
   type OrchestratorDelta,
 } from "@/types/orchestrator";
@@ -153,7 +155,11 @@ export function OrchestratorProvider({ children }: { children: ReactNode }) {
           setLastOutreach(data.outreach.message);
         }
 
-        router.refresh();
+        if (orchestratorDeltaNeedsRscRefresh(data.delta)) {
+          startTransition(() => {
+            router.refresh();
+          });
+        }
       } catch {
         setMessages((m) => [
           ...m,
@@ -171,10 +177,9 @@ export function OrchestratorProvider({ children }: { children: ReactNode }) {
     [router, clearFlowLater],
   );
 
-  const isPulsing = busy || manualPulse;
-
-  const value = useMemo(
-    () => ({
+  const value = useMemo(() => {
+    const isPulsing = busy || manualPulse;
+    return {
       open,
       setOpen,
       busy,
@@ -185,19 +190,18 @@ export function OrchestratorProvider({ children }: { children: ReactNode }) {
       clearMessages,
       send,
       lastOutreach,
-    }),
-    [
-      open,
-      busy,
-      isPulsing,
-      flowTarget,
-      triggerManualPulse,
-      messages,
-      clearMessages,
-      send,
-      lastOutreach,
-    ],
-  );
+    };
+  }, [
+    open,
+    busy,
+    manualPulse,
+    flowTarget,
+    triggerManualPulse,
+    messages,
+    clearMessages,
+    send,
+    lastOutreach,
+  ]);
 
   return (
     <OrchestratorContext.Provider value={value}>
