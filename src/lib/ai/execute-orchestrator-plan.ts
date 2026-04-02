@@ -26,6 +26,61 @@ function parseIsoDate(s: string | undefined): string | null {
   return /^\d{4}-\d{2}-\d{2}$/.test(t) ? t : null;
 }
 
+const ORCHESTRATOR_ERR_UI_MAX = 1400;
+
+function truncateForUi(s: string, max: number): string {
+  const t = s.trim();
+  if (t.length <= max) return t;
+  return `${t.slice(0, max - 1)}…`;
+}
+
+/** Readable message for chat + logs when catch receives non-Error throws (e.g. some client payloads). */
+function formatOrchestratorExecutionError(e: unknown, depth = 0): string {
+  if (depth > 4) return truncateForUi("Nested error (truncated).", ORCHESTRATOR_ERR_UI_MAX);
+  if (e === undefined || e === null) {
+    return "Something went wrong while saving to your workspace (no details).";
+  }
+  if (typeof e === "string") {
+    const t = e.trim();
+    return t
+      ? truncateForUi(t, ORCHESTRATOR_ERR_UI_MAX)
+      : "Unknown error.";
+  }
+  if (e instanceof Error) {
+    let m = e.message.trim();
+    const cause = (e as Error & { cause?: unknown }).cause;
+    if (cause != null && depth < 3) {
+      const c = formatOrchestratorExecutionError(cause, depth + 1);
+      if (c && !m.includes(c)) m = m ? `${m} — ${c}` : c;
+    }
+    return m
+      ? truncateForUi(m, ORCHESTRATOR_ERR_UI_MAX)
+      : "Unknown error.";
+  }
+  if (typeof e === "object") {
+    const o = e as Record<string, unknown>;
+    const msg = typeof o.message === "string" ? o.message.trim() : "";
+    const details = typeof o.details === "string" ? o.details.trim() : "";
+    const hint = typeof o.hint === "string" ? o.hint.trim() : "";
+    const code = typeof o.code === "string" ? o.code.trim() : "";
+    const parts = [
+      msg,
+      code ? `[${code}]` : "",
+      details,
+      hint,
+    ].filter(Boolean);
+    if (parts.length) {
+      return truncateForUi(parts.join(" — "), ORCHESTRATOR_ERR_UI_MAX);
+    }
+    try {
+      return truncateForUi(JSON.stringify(e), ORCHESTRATOR_ERR_UI_MAX);
+    } catch {
+      return "Orchestrator execution failed (could not serialize error).";
+    }
+  }
+  return truncateForUi(String(e), ORCHESTRATOR_ERR_UI_MAX);
+}
+
 function experienceBlockCount(plan: OrchestratorPlan): number {
   const fromList =
     plan.experiences?.filter((e) => e.title?.trim()).length ?? 0;
@@ -591,8 +646,10 @@ export async function executeOrchestratorPlan(
       delta,
     };
   } catch (e) {
-    const msg =
-      e instanceof Error ? e.message : "Orchestrator execution failed.";
+    const msg = formatOrchestratorExecutionError(e);
+    if (process.env.NODE_ENV === "development") {
+      console.error("[executeOrchestratorPlan]", e);
+    }
     await logBioVault(supabase, userId, "assistant", msg, {
       intent: plan.intent,
       error: true,
