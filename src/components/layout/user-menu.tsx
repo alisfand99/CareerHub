@@ -36,7 +36,7 @@ export function UserMenu({ email }: { email: string | null }) {
   return (
     <div className="space-y-2">
       <p
-        className="truncate px-1 font-mono text-[0.65rem] text-slate-600/55"
+        className="truncate px-1 font-mono text-[0.65rem] text-white/45"
         title={email}
       >
         {email}

@@ -6,15 +6,15 @@ export const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "normal-case tracking-normal border-cyan-500/40 bg-cyan-500/[0.12] text-cyan-700 hover:border-cyan-600/60 hover:bg-cyan-500/[0.18] hover:text-cyan-800",
+          "normal-case tracking-normal border-cyan-400/50 bg-cyan-400/[0.12] text-cyan-100 hover:border-cyan-300/60 hover:bg-cyan-400/20 hover:text-white",
         outline:
-          "text-[0.7rem] uppercase tracking-[0.22em] border-slate-900/10 bg-white/60 text-slate-900/90 backdrop-blur-sm hover:border-cyan-500/40 hover:bg-cyan-500/10 hover:text-slate-900 aria-expanded:bg-cyan-500/10",
+          "text-[0.7rem] uppercase tracking-[0.22em] border-white/10 bg-white/5 text-white/90 backdrop-blur-sm hover:border-cyan-500/35 hover:bg-white/[0.08] hover:text-white aria-expanded:bg-white/[0.08]",
         secondary:
-          "normal-case tracking-normal border-slate-900/10 bg-white/65 text-slate-900/85 hover:border-slate-900/15 hover:bg-white/80",
+          "normal-case tracking-normal border-white/10 bg-white/[0.06] text-white/85 hover:border-white/15 hover:bg-white/[0.1]",
         ghost:
-          "normal-case tracking-normal text-slate-700/70 hover:bg-cyan-500/10 hover:text-slate-900 aria-expanded:bg-cyan-500/10",
+          "normal-case tracking-normal text-white/70 hover:bg-white/[0.06] hover:text-white aria-expanded:bg-white/[0.06]",
         destructive:
-          "normal-case tracking-normal border-red-500/35 bg-red-500/12 text-red-700 hover:border-red-400/45 hover:bg-red-500/18 focus-visible:ring-red-400/25",
+          "normal-case tracking-normal border-red-500/30 bg-red-500/10 text-red-300 hover:border-red-400/40 hover:bg-red-500/15 focus-visible:ring-red-400/25",
         link: "border-transparent text-sm normal-case tracking-normal text-cyan-400 underline-offset-4 hover:text-cyan-300 hover:underline",
       },
       size: {
