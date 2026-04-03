@@ -161,6 +161,7 @@
     --sidebar-ring: #22d3ee;
   }
 
+  /* If you change tokens here, mirror `src/lib/critical-css-fallback.ts` (inline head fallback). */
   .dark {
     --background: #050505;
     --foreground: #fafafa;

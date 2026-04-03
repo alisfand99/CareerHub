@@ -403,6 +403,18 @@ create policy "lang_insert_own" on public.language_entries for insert with check
 create policy "lang_update_own" on public.language_entries for update using (auth.uid() = user_id);
 create policy "lang_delete_own" on public.language_entries for delete using (auth.uid() = user_id);
 
+
+-- --- patch: 001_master_skills_metadata.sql ---
+-- Idempotent: add metadata for skill origin tagging (e.g. market_demand vs acquired).
+-- Needed for DBs created before schema.sql included this column (CREATE TABLE IF NOT EXISTS
+-- does not add new columns to existing tables).
+alter table public.master_skills
+  add column if not exists metadata jsonb not null default '{}'::jsonb;
+
+-- Ask PostgREST to reload its schema cache so the API sees the column (avoids PGRST204).
+notify pgrst, 'reload schema';
+
+
 -- Dummy data + test auth user for Career-Hub AI
 -- Run AFTER schema.sql (or use provision_all.sql).
 -- Test login (email / password):

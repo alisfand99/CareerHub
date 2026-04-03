@@ -29,6 +29,9 @@ export const buttonVariants = cva(
         "icon-sm":
           "size-7 rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg",
         "icon-lg": "size-9",
+        /** Multiline labels (e.g. orchestrator quick actions); do not fix height. */
+        multiline:
+          "h-auto min-h-10 items-start justify-start gap-2 whitespace-normal px-3 py-2.5 text-left text-[0.72rem] leading-snug has-data-[icon=inline-end]:pr-3 has-data-[icon=inline-start]:pl-3 [&_svg:not([class*='size-'])]:size-4",
       },
     },
     defaultVariants: {

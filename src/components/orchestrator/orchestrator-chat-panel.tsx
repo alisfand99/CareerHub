@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { Loader2, MessageSquare, Send, X } from "lucide-react";
+import { Loader2, MessageSquare, Send, Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
@@ -94,17 +94,17 @@ export function OrchestratorChatPanel() {
     <>
       <div
         className={cn(
-          "fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col border-l border-white/10 bg-[#080808]/95 shadow-2xl backdrop-blur-xl transition-transform duration-300 ease-out",
+          "fixed inset-y-0 right-0 z-50 flex h-dvh max-h-dvh w-full max-w-md min-w-0 flex-col border-l border-white/10 bg-[#080808]/95 shadow-2xl backdrop-blur-xl transition-transform duration-300 ease-out",
           open ? "translate-x-0" : "translate-x-full pointer-events-none",
         )}
         aria-hidden={!open}
       >
-        <header className="flex shrink-0 items-center justify-between gap-3 border-b border-white/[0.08] px-4 py-3">
-          <div className="flex items-center gap-2">
-            <div className="flex size-9 items-center justify-center rounded-lg border border-cyan-500/25 bg-cyan-500/10 text-cyan-300">
+        <header className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-white/[0.08] px-4 py-3">
+          <div className="flex min-w-0 flex-1 items-center gap-2">
+            <div className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-cyan-500/25 bg-cyan-500/10 text-cyan-300">
               <MessageSquare className="size-4" aria-hidden />
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="font-serif text-sm font-medium tracking-tight text-white">
                 Career assistant
               </p>
@@ -113,14 +113,15 @@ export function OrchestratorChatPanel() {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex shrink-0 items-center gap-1.5">
             <Button
               type="button"
-              variant="ghost"
+              variant="outline"
               size="sm"
-              className="text-xs text-muted-foreground"
+              className="gap-1.5 border-white/15 bg-white/[0.04] text-xs text-white/80 hover:bg-white/[0.08] hover:text-white"
               onClick={() => clearMessages()}
             >
+              <Trash2 className="size-3.5 shrink-0 opacity-80" aria-hidden />
               Clear
             </Button>
             <Button
@@ -193,19 +194,19 @@ export function OrchestratorChatPanel() {
           </div>
         ) : null}
 
-        <div className="shrink-0 space-y-2 border-t border-white/[0.08] bg-[#060606]/90 px-3 py-3">
+        <div className="shrink-0 space-y-3 border-t border-white/[0.08] bg-[#060606]/90 px-3 py-3">
           {contextHint}
           <p className="font-mono text-[0.6rem] font-semibold uppercase tracking-[0.28em] text-white/40">
             Quick actions
           </p>
-          <div className="flex flex-wrap gap-1.5">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             {QUICK_ACTIONS.map((a) => (
               <Button
                 key={a.id}
                 type="button"
                 variant="secondary"
-                size="sm"
-                className="h-auto min-h-8 whitespace-normal border-white/10 px-2 py-1.5 text-left text-[0.7rem] normal-case leading-tight tracking-normal"
+                size="multiline"
+                className="w-full border-white/12 bg-white/[0.07] text-white/90 hover:border-cyan-500/25 hover:bg-white/[0.1]"
                 disabled={busy}
                 onClick={() => {
                   setInput((cur) => a.fill(cur));
@@ -222,7 +223,7 @@ export function OrchestratorChatPanel() {
 
         <form
           onSubmit={(e) => void onSubmit(e)}
-          className="shrink-0 border-t border-border p-3"
+          className="flex shrink-0 flex-col gap-2 border-t border-border bg-[#060606]/95 p-3"
         >
           <label className="sr-only" htmlFor="orch-input">
             Message
@@ -230,17 +231,17 @@ export function OrchestratorChatPanel() {
           <textarea
             ref={textareaRef}
             id="orch-input"
-            rows={3}
+            rows={4}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Paste a job posting, add skills, or ask for outreach…"
             disabled={busy}
-            className="mb-2 w-full resize-none rounded-md border border-input bg-background px-3 py-2 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
+            className="min-h-[6.5rem] w-full resize-y rounded-lg border border-white/12 bg-[#0c0c0c] px-3 py-2.5 text-sm leading-relaxed text-white outline-none ring-offset-[#050505] placeholder:text-white/40 focus-visible:border-cyan-500/35 focus-visible:ring-2 focus-visible:ring-cyan-500/30 disabled:opacity-50"
           />
           <Button
             type="submit"
             disabled={busy || !input.trim()}
-            className="w-full gap-2 bg-brand-action hover:bg-brand-action-hover"
+            className="h-10 w-full shrink-0 gap-2 bg-brand-action hover:bg-brand-action-hover"
           >
             {busy ? (
               <>
