@@ -13,16 +13,16 @@ export function HeroBackdrop({ children, className }: HeroBackdropProps) {
   return (
     <div
       className={cn(
-        "relative min-h-screen overflow-hidden bg-[#050505] text-white",
+        "relative min-h-screen overflow-hidden bg-[var(--bg)] text-[var(--text)]",
         className,
       )}
     >
       <div
-        className="pointer-events-none absolute -right-32 top-0 h-[28rem] w-[28rem] rounded-full bg-cyan-500/15 blur-[100px]"
+        className="pointer-events-none absolute -right-32 top-0 h-[28rem] w-[28rem] rounded-full bg-cyan-200/30 blur-[110px]"
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute -left-24 bottom-0 h-[22rem] w-[22rem] rounded-full bg-amber-500/10 blur-[90px]"
+        className="pointer-events-none absolute -left-24 bottom-0 h-[22rem] w-[22rem] rounded-full bg-amber-200/25 blur-[95px]"
         aria-hidden
       />
       <div

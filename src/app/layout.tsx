@@ -34,7 +34,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn("dark", lora.variable, jetbrainsMono.variable)}
+      className={cn(lora.variable, jetbrainsMono.variable)}
     >
       <head>
         <style

@@ -50,7 +50,7 @@ function NeuralCoreOrb({
     <motion.button
       type="button"
       onClick={onOpen}
-      className="group/core relative flex size-[8.5rem] shrink-0 items-center justify-center rounded-full outline-none ring-offset-[#050505] transition-shadow duration-500 hover:shadow-[0_0_40px_-8px_rgba(34,211,238,0.35)] focus-visible:ring-2 focus-visible:ring-cyan-400/50 md:size-[10.25rem]"
+      className="group/core relative flex size-[8.5rem] shrink-0 items-center justify-center rounded-full outline-none ring-offset-white transition-shadow duration-500 hover:shadow-[0_0_40px_-8px_rgba(6,182,212,0.22)] focus-visible:ring-2 focus-visible:ring-cyan-600/40 md:size-[10.25rem]"
       aria-label="Open command center"
       whileHover={{ scale: 1.025 }}
       whileTap={{ scale: 0.98 }}
@@ -69,7 +69,7 @@ function NeuralCoreOrb({
         }}
       />
       <motion.span
-        className="absolute inset-[-28%] rounded-full bg-[radial-gradient(circle,rgba(34,211,238,0.14)_0%,transparent_68%)] blur-2xl"
+        className="absolute inset-[-28%] rounded-full bg-[radial-gradient(circle,rgba(6,182,212,0.18)_0%,transparent_68%)] blur-2xl"
         animate={{
           opacity: isPulsing ? [0.55, 0.88, 0.55] : 0.5,
           scale: isPulsing ? [1, 1.05, 1] : 1,
@@ -86,7 +86,7 @@ function NeuralCoreOrb({
         aria-hidden
       />
       <span
-        className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_35%_28%,rgba(255,255,255,0.2)_0%,rgba(34,211,238,0.28)_22%,rgba(8,12,18,0.95)_58%,rgba(5,5,6,0.98)_100%)]"
+        className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_35%_28%,rgba(255,255,255,0.32)_0%,rgba(34,211,238,0.26)_22%,rgba(15,23,42,0.06)_58%,rgba(15,23,42,0.10)_100%)]"
         style={{
           boxShadow:
             "inset 0 0 36px rgba(34,211,238,0.12), inset 0 1px 0 rgba(255,255,255,0.06)",
@@ -94,11 +94,11 @@ function NeuralCoreOrb({
         aria-hidden
       />
       <span
-        className="absolute inset-[14%] rounded-full border border-white/[0.07] bg-[radial-gradient(circle_at_50%_50%,rgba(0,0,0,0.2)_0%,rgba(5,5,8,0.85)_100%)]"
+        className="absolute inset-[14%] rounded-full border border-slate-900/10 bg-[radial-gradient(circle_at_50%_50%,rgba(15,23,42,0.04)_0%,rgba(15,23,42,0.09)_100%)]"
         aria-hidden
       />
       <Sparkles
-        className="relative z-10 size-9 text-cyan-100/95 drop-shadow-[0_0_20px_rgba(34,211,238,0.45)] transition-transform duration-500 group-hover/core:scale-105 md:size-10"
+        className="relative z-10 size-9 text-cyan-700/95 drop-shadow-[0_0_18px_rgba(6,182,212,0.22)] transition-transform duration-500 group-hover/core:scale-105 md:size-10"
         aria-hidden
       />
     </motion.button>
@@ -121,7 +121,7 @@ export function CircularOrchestratorHub({
 
   return (
     <section
-      className="relative overflow-hidden rounded-2xl border border-white/[0.09] bg-gradient-to-br from-[#080808] via-[#060606] to-[#050505] p-2 shadow-[inset_0_0_0_1px_rgba(34,211,238,0.06)]"
+      className="relative overflow-hidden rounded-2xl border border-slate-900/10 bg-gradient-to-br from-white/80 via-white/70 to-white/60 p-2 shadow-[inset_0_0_0_1px_rgba(6,182,212,0.10)]"
       aria-label="Orchestrator command center"
     >
       <div
@@ -142,7 +142,7 @@ export function CircularOrchestratorHub({
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80"
+        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white/75"
         aria-hidden
       />
 
@@ -196,10 +196,10 @@ export function CircularOrchestratorHub({
         </div>
       </div>
 
-      <p className="relative z-10 border-t border-white/[0.06] bg-black/30 px-4 py-3 text-center font-serif text-xs font-light leading-relaxed text-white/40 md:px-8">
+      <p className="relative z-10 border-t border-slate-900/10 bg-white/[0.62] px-4 py-3 text-center font-serif text-xs font-light leading-relaxed text-slate-600/70 md:px-8">
         Intent routes to each pillar. Open the{" "}
-        <span className="text-cyan-400/75">command center</span> above — or
-        use <span className="font-mono text-white/50">+</span> on hover to add
+        <span className="text-cyan-700/75">command center</span> above — or
+        use <span className="font-mono text-slate-700/45">+</span> on hover to add
         manually.
       </p>
     </section>
@@ -226,52 +226,52 @@ function PillarMindCard({
   return (
     <div
       className={cn(
-        "group/card relative overflow-hidden rounded-xl border border-white/[0.07] bg-white/[0.025] backdrop-blur-sm transition-all duration-500",
-        "hover:border-white/[0.11] hover:bg-white/[0.035]",
-        highlight && "border-cyan-500/25 bg-white/[0.04]",
+        "group/card relative overflow-hidden rounded-xl border border-slate-900/10 bg-white/55 backdrop-blur-sm transition-all duration-500",
+        "hover:border-cyan-500/30 hover:bg-white/70",
+        highlight && "border-cyan-500/35 bg-cyan-500/8",
       )}
     >
-      <p className="pointer-events-none absolute right-3 top-2 font-mono text-[0.55rem] uppercase tracking-[0.2em] text-white/0 transition-opacity duration-300 group-hover/card:text-white/35">
+      <p className="pointer-events-none absolute right-3 top-2 font-mono text-[0.55rem] uppercase tracking-[0.2em] text-slate-700/0 transition-opacity duration-300 group-hover/card:text-slate-700/35">
         Routed
       </p>
 
       <div className="relative flex items-center gap-3 px-4 py-3 md:gap-3 md:px-4 md:py-3.5">
         <Link
           href={href}
-          className="flex min-w-0 flex-1 items-center gap-3 rounded-lg outline-none ring-offset-[#050505] focus-visible:ring-2 focus-visible:ring-cyan-400/40 md:gap-3.5"
+          className="flex min-w-0 flex-1 items-center gap-3 rounded-lg outline-none ring-offset-white focus-visible:ring-2 focus-visible:ring-cyan-600/35 md:gap-3.5"
         >
           <span
             className={cn(
-              "flex size-10 shrink-0 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.05]",
-              highlight && "border-cyan-500/20 bg-cyan-500/[0.08]",
+              "flex size-10 shrink-0 items-center justify-center rounded-lg border border-slate-900/10 bg-white/60",
+              highlight && "border-cyan-500/25 bg-cyan-500/[0.10]",
             )}
           >
             <Icon
               className={cn(
                 "size-[1.15rem]",
-                highlight ? "text-cyan-200/90" : "text-white/55",
+                highlight ? "text-cyan-700/90" : "text-slate-600/70",
               )}
               aria-hidden
             />
           </span>
           <div className="min-w-0 flex-1 text-left">
-            <p className="truncate font-mono text-[0.7rem] font-medium uppercase tracking-[0.16em] text-white/88">
+            <p className="truncate font-mono text-[0.7rem] font-medium uppercase tracking-[0.16em] text-slate-900/90">
               {title}
             </p>
-            <p className="mt-0.5 truncate font-serif text-xs font-light text-white/45">
+            <p className="mt-0.5 truncate font-serif text-xs font-light text-slate-600/70">
               {subtitle}
             </p>
           </div>
           <span
             className={cn(
-              "shrink-0 rounded-full border border-white/10 bg-white/[0.05] px-2.5 py-0.5 font-mono text-xs tabular-nums text-white/75",
-              highlight && "border-cyan-500/20 text-cyan-100/90",
+              "shrink-0 rounded-full border border-slate-900/10 bg-white/70 px-2.5 py-0.5 font-mono text-xs tabular-nums text-slate-800/80",
+              highlight && "border-cyan-500/25 text-cyan-700/90",
             )}
           >
             {count}
           </span>
           <ChevronRight
-            className="size-4 shrink-0 text-white/25 transition-colors group-hover/card:text-white/45"
+            className="size-4 shrink-0 text-slate-500/55 transition-colors group-hover/card:text-slate-500/75"
             aria-hidden
           />
         </Link>

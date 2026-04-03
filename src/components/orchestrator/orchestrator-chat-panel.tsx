@@ -70,21 +70,21 @@ export function OrchestratorChatPanel() {
 
   const contextHint =
     pathname.startsWith("/apply-hub") ? (
-      <p className="rounded-lg border border-cyan-500/25 bg-cyan-500/[0.06] px-3 py-2 font-mono text-[0.65rem] leading-relaxed text-white/80">
+      <p className="rounded-lg border border-cyan-500/25 bg-cyan-500/[0.06] px-3 py-2 font-mono text-[0.65rem] leading-relaxed text-slate-700/85">
         <span className="text-cyan-400/90">Tip:</span> Found a role? Click{" "}
-        <strong className="text-white">Found a Job</strong>, then paste the
+        <strong className="text-slate-900">Found a Job</strong>, then paste the
         posting below.
       </p>
     ) : pathname.startsWith("/network") ? (
-      <p className="rounded-lg border border-cyan-500/25 bg-cyan-500/[0.06] px-3 py-2 font-mono text-[0.65rem] leading-relaxed text-white/80">
+      <p className="rounded-lg border border-cyan-500/25 bg-cyan-500/[0.06] px-3 py-2 font-mono text-[0.65rem] leading-relaxed text-slate-700/85">
         <span className="text-cyan-400/90">Tip:</span> Ready to connect? Try{" "}
-        <strong className="text-white">Outreach Script</strong> for a tailored
+        <strong className="text-slate-900">Outreach Script</strong> for a tailored
         draft.
       </p>
     ) : pathname.startsWith("/bio-vault") ? (
-      <p className="rounded-lg border border-cyan-500/25 bg-cyan-500/[0.06] px-3 py-2 font-mono text-[0.65rem] leading-relaxed text-white/80">
+      <p className="rounded-lg border border-cyan-500/25 bg-cyan-500/[0.06] px-3 py-2 font-mono text-[0.65rem] leading-relaxed text-slate-700/85">
         <span className="text-cyan-400/90">Tip:</span> Pasting a full CV? Click{" "}
-        <strong className="text-white">Import résumé</strong>, then paste your
+        <strong className="text-slate-900">Import résumé</strong>, then paste your
         text — or paste directly; long profile text is treated as a Bio-Vault
         import.
       </p>
@@ -94,18 +94,18 @@ export function OrchestratorChatPanel() {
     <>
       <div
         className={cn(
-          "fixed inset-y-0 right-0 z-50 flex h-dvh max-h-dvh w-full max-w-md min-w-0 flex-col border-l border-white/10 bg-[#080808]/95 shadow-2xl backdrop-blur-xl transition-transform duration-300 ease-out",
+          "fixed inset-y-0 right-0 z-50 flex h-dvh max-h-dvh w-full max-w-md min-w-0 flex-col border-l border-slate-900/10 bg-white/[0.88] shadow-[var(--shadow)] backdrop-blur-xl transition-transform duration-300 ease-out",
           open ? "translate-x-0" : "translate-x-full pointer-events-none",
         )}
         aria-hidden={!open}
       >
-        <header className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-white/[0.08] px-4 py-3">
+        <header className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-slate-900/10 px-4 py-3">
           <div className="flex min-w-0 flex-1 items-center gap-2">
-            <div className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-cyan-500/25 bg-cyan-500/10 text-cyan-300">
+            <div className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-cyan-500/25 bg-cyan-500/10 text-cyan-700">
               <MessageSquare className="size-4" aria-hidden />
             </div>
             <div className="min-w-0">
-              <p className="font-serif text-sm font-medium tracking-tight text-white">
+              <p className="font-serif text-sm font-medium tracking-tight text-slate-900">
                 Career assistant
               </p>
               <p className="font-mono text-[0.6rem] uppercase tracking-[0.28em] text-cyan-500/70">
@@ -118,7 +118,7 @@ export function OrchestratorChatPanel() {
               type="button"
               variant="outline"
               size="sm"
-              className="gap-1.5 border-white/15 bg-white/[0.04] text-xs text-white/80 hover:bg-white/[0.08] hover:text-white"
+              className="gap-1.5 border-slate-900/10 bg-white/[0.75] text-xs text-slate-700 hover:bg-white/90 hover:text-slate-900"
               onClick={() => clearMessages()}
             >
               <Trash2 className="size-3.5 shrink-0 opacity-80" aria-hidden />
@@ -138,14 +138,14 @@ export function OrchestratorChatPanel() {
 
         <ScrollArea className="min-h-0 flex-1 px-3 py-3">
           {messages.length === 0 ? (
-            <div className="space-y-3 rounded-xl border border-dashed border-white/15 bg-white/[0.03] p-4 font-serif text-sm font-light leading-relaxed text-white/60">
-              <p className="font-medium text-white/90">How to use it</p>
+            <div className="space-y-3 rounded-xl border border-dashed border-slate-900/15 bg-white/[0.7] p-4 font-serif text-sm font-light leading-relaxed text-slate-600/85">
+              <p className="font-medium text-slate-900">How to use it</p>
               <p>
                 Pick a shortcut or type freely. The assistant updates your
                 pipeline, skills, and contacts when it recognizes a request, and
                 shows a short summary of what changed.
               </p>
-              <p className="font-mono text-[0.65rem] text-white/45">
+              <p className="font-mono text-[0.65rem] text-slate-600/55">
                 Smart replies need the AI service enabled for this deployment.
               </p>
             </div>
@@ -157,8 +157,8 @@ export function OrchestratorChatPanel() {
                   className={cn(
                     "rounded-xl px-3 py-2.5 text-sm leading-relaxed transition-colors duration-500",
                     m.role === "user"
-                      ? "ml-4 border border-cyan-500/20 bg-cyan-500/10 font-serif text-white/90"
-                      : "mr-4 border border-white/10 bg-white/[0.05] font-serif font-light text-white/70",
+                      ? "ml-4 border border-cyan-500/20 bg-cyan-500/10 font-serif text-slate-900"
+                      : "mr-4 border border-slate-900/10 bg-white/80 font-serif font-light text-slate-700/90",
                   )}
                 >
                   {m.content}
@@ -173,11 +173,11 @@ export function OrchestratorChatPanel() {
         </ScrollArea>
 
         {lastOutreach ? (
-          <div className="shrink-0 border-t border-white/[0.08] bg-white/[0.03] px-3 py-2">
+          <div className="shrink-0 border-t border-slate-900/10 bg-white/[0.65] px-3 py-2">
             <p className="font-mono text-[0.65rem] font-medium uppercase tracking-wider text-cyan-500/80">
               Latest outreach draft
             </p>
-            <p className="mt-1 max-h-24 overflow-y-auto font-mono text-xs text-white/55">
+            <p className="mt-1 max-h-24 overflow-y-auto font-mono text-xs text-slate-600/65">
               {lastOutreach}
             </p>
             <Button
@@ -194,9 +194,9 @@ export function OrchestratorChatPanel() {
           </div>
         ) : null}
 
-        <div className="shrink-0 space-y-3 border-t border-white/[0.08] bg-[#060606]/90 px-3 py-3">
+        <div className="shrink-0 space-y-3 border-t border-slate-900/10 bg-white/[0.55] px-3 py-3">
           {contextHint}
-          <p className="font-mono text-[0.6rem] font-semibold uppercase tracking-[0.28em] text-white/40">
+          <p className="font-mono text-[0.6rem] font-semibold uppercase tracking-[0.28em] text-slate-600/55">
             Quick actions
           </p>
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -206,7 +206,7 @@ export function OrchestratorChatPanel() {
                 type="button"
                 variant="secondary"
                 size="multiline"
-                className="w-full border-white/12 bg-white/[0.07] text-white/90 hover:border-cyan-500/25 hover:bg-white/[0.1]"
+                className="w-full border-slate-900/10 bg-white/80 text-slate-700 hover:border-cyan-500/30 hover:bg-white/95"
                 disabled={busy}
                 onClick={() => {
                   setInput((cur) => a.fill(cur));
@@ -223,7 +223,7 @@ export function OrchestratorChatPanel() {
 
         <form
           onSubmit={(e) => void onSubmit(e)}
-          className="flex shrink-0 flex-col gap-2 border-t border-border bg-[#060606]/95 p-3"
+          className="flex shrink-0 flex-col gap-2 border-t border-border bg-white/80 p-3"
         >
           <label className="sr-only" htmlFor="orch-input">
             Message
@@ -236,7 +236,7 @@ export function OrchestratorChatPanel() {
             onChange={(e) => setInput(e.target.value)}
             placeholder="Paste a job posting, add skills, or ask for outreach…"
             disabled={busy}
-            className="min-h-[6.5rem] w-full resize-y rounded-lg border border-white/12 bg-[#0c0c0c] px-3 py-2.5 text-sm leading-relaxed text-white outline-none ring-offset-[#050505] placeholder:text-white/40 focus-visible:border-cyan-500/35 focus-visible:ring-2 focus-visible:ring-cyan-500/30 disabled:opacity-50"
+            className="min-h-[6.5rem] w-full resize-y rounded-lg border border-slate-900/10 bg-white px-3 py-2.5 text-sm leading-relaxed text-slate-900 outline-none ring-offset-white placeholder:text-slate-600/50 focus-visible:border-cyan-500/35 focus-visible:ring-2 focus-visible:ring-cyan-500/30 disabled:opacity-50"
           />
           <Button
             type="submit"
@@ -262,7 +262,7 @@ export function OrchestratorChatPanel() {
         <button
           type="button"
           aria-label="Close overlay"
-          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-[1px] md:bg-black/20"
+          className="fixed inset-0 z-40 bg-slate-900/10 backdrop-blur-[1px] md:bg-slate-900/5"
           onClick={() => setOpen(false)}
         />
       ) : null}

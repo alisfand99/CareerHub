@@ -22,9 +22,9 @@ import {
 import { cn } from "@/lib/utils";
 
 const DECK =
-  "rounded-3xl border border-fuchsia-500/25 bg-[#0a0a0c] p-4 text-zinc-100 shadow-[0_0_40px_-8px_rgba(192,38,211,0.35)] md:p-6";
+  "rounded-3xl border border-fuchsia-500/25 bg-white/70 p-4 text-slate-900 shadow-[0_18px_45px_rgba(2,6,23,0.10)] md:p-6";
 const PANEL =
-  "rounded-2xl border border-fuchsia-500/20 bg-zinc-950/80 p-4 shadow-[inset_0_1px_0_0_rgba(232,121,249,0.08)]";
+  "rounded-2xl border border-fuchsia-500/20 bg-white/55 p-4 shadow-[inset_0_1px_0_0_rgba(232,121,249,0.08)]";
 
 function GlowBar({
   value,
@@ -91,7 +91,7 @@ function MatchDonut({ percent }: { percent: number | null }) {
         <span className="text-[0.65rem] font-medium uppercase tracking-widest text-fuchsia-300/80">
           Match
         </span>
-        <span className="text-2xl font-bold tabular-nums text-white">
+        <span className="text-2xl font-bold tabular-nums text-slate-900">
           {percent == null ? "—" : `${Math.round(p)}%`}
         </span>
       </div>
@@ -185,7 +185,7 @@ export function JobCommandDeck({
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <Link
           href="/apply-hub"
-          className="inline-flex items-center gap-2 rounded-full border border-fuchsia-500/30 bg-zinc-900/80 px-3 py-1.5 text-sm text-fuchsia-200 shadow-[0_0_16px_rgba(192,38,211,0.2)] transition hover:border-fuchsia-400/50 hover:text-white"
+          className="inline-flex items-center gap-2 rounded-full border border-fuchsia-500/30 bg-white/70 px-3 py-1.5 text-sm text-fuchsia-800 shadow-[0_18px_45px_rgba(2,6,23,0.10)] transition hover:border-fuchsia-400/55 hover:text-slate-900"
         >
           <ArrowLeft className="size-4" aria-hidden />
           Apply Hub
@@ -208,7 +208,7 @@ export function JobCommandDeck({
             </div>
             <div className="min-w-0 flex-1 space-y-3">
               <div>
-                <h1 className="text-balance text-xl font-bold leading-tight text-white md:text-2xl">
+                <h1 className="text-balance text-xl font-bold leading-tight text-slate-900 md:text-2xl">
                   {job.title}
                 </h1>
                 <p className="mt-1 text-sm text-fuchsia-200/80">{job.company}</p>
@@ -217,7 +217,7 @@ export function JobCommandDeck({
                 <li className="flex items-center gap-2 text-zinc-300">
                   <Layers className="size-4 shrink-0 text-fuchsia-400" />
                   <span className="text-zinc-500">Track</span>
-                  <span className="font-medium text-white">
+                  <span className="font-medium text-slate-900">
                     {STATUS_LABEL[job.status] ?? job.status}
                   </span>
                 </li>
@@ -229,7 +229,7 @@ export function JobCommandDeck({
                 <li className="flex items-center gap-2 text-zinc-300">
                   <Briefcase className="size-4 shrink-0 text-fuchsia-400" />
                   <span className="text-zinc-500">Job family</span>
-                  <span className="truncate font-medium text-white">
+                  <span className="truncate font-medium text-slate-900">
                     {intel.jobFamily}
                   </span>
                 </li>
@@ -432,7 +432,7 @@ export function JobCommandDeck({
                 <li key={c.id}>
                   <Link
                     href={`/network#c-${c.id}`}
-                    className="inline-flex items-center rounded-full border border-fuchsia-500/35 bg-zinc-900/90 px-3 py-1.5 text-sm font-medium text-fuchsia-100 shadow-[0_0_12px_rgba(192,38,211,0.2)] transition hover:border-fuchsia-400/55 hover:text-white"
+                    className="inline-flex items-center rounded-full border border-fuchsia-500/35 bg-white/70 px-3 py-1.5 text-sm font-medium text-fuchsia-800 shadow-[0_18px_45px_rgba(2,6,23,0.10)] transition hover:border-fuchsia-400/55 hover:text-slate-900"
                   >
                     {c.full_name}
                   </Link>

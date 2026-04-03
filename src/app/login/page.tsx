@@ -11,7 +11,7 @@ export default function LoginPage() {
         <header className="ch-section-rail mb-10 border-cyan-500/25 text-center md:text-left">
           <p className="ch-eyebrow">Career-Hub AI</p>
           <h1 className="ch-display mt-4">
-            Welcome <span className="text-white/35">back.</span>
+            Welcome <span className="text-slate-900/35">back.</span>
           </h1>
           <p className="ch-body mx-auto mt-4 max-w-md md:mx-0">
             Sign in to open your command center. Your information stays private
