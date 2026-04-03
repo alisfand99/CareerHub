@@ -24,10 +24,10 @@ export function UserMenu({ email }: { email: string | null }) {
         href="/login"
         className={cn(
           buttonVariants({ variant: "secondary" }),
-          "w-full justify-start gap-2",
+          "w-full justify-start gap-2 normal-case tracking-normal",
         )}
       >
-        <LogIn className="size-4" aria-hidden />
+        <LogIn className="size-4 text-cyan-400/80" aria-hidden />
         Sign in
       </Link>
     );
@@ -35,7 +35,10 @@ export function UserMenu({ email }: { email: string | null }) {
 
   return (
     <div className="space-y-2">
-      <p className="truncate px-1 text-xs text-muted-foreground" title={email}>
+      <p
+        className="truncate px-1 font-mono text-[0.65rem] text-white/45"
+        title={email}
+      >
         {email}
       </p>
       <Button

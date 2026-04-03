@@ -73,9 +73,21 @@ export default async function DashboardPage() {
   );
 
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-10">
+    <div className="flex flex-col gap-20 md:gap-24">
+      <section className="ch-section-rail space-y-6 border-cyan-500/25">
+        <p className="ch-eyebrow">Career intelligence</p>
+        <h1 className="ch-display max-w-4xl">
+          Your career{" "}
+          <span className="text-white/35">command center.</span>
+        </h1>
+        <p className="ch-body max-w-2xl">
+          Orchestrate applications, evidence in Bio-Vault, and network motion
+          from one calm surface — built for clarity under pressure.
+        </p>
+      </section>
+
       {!configured ? (
-        <Card className="border-amber-500/40 bg-amber-500/5 shadow-md">
+        <Card className="border-amber-500/35 border-dashed bg-amber-500/[0.06]">
           <CardHeader>
             <CardTitle className="text-base">Setup required</CardTitle>
             <CardDescription>{workspaceNotReady}</CardDescription>
@@ -96,7 +108,7 @@ export default async function DashboardPage() {
       ) : null}
 
       {configured && loadError ? (
-        <Card className="border-destructive/40 bg-destructive/5 shadow-md">
+        <Card className="border-red-500/35 bg-red-500/[0.06]">
           <CardHeader>
             <CardTitle className="text-base">Data sync issue</CardTitle>
             <CardDescription>{loadError}</CardDescription>
@@ -108,7 +120,7 @@ export default async function DashboardPage() {
       ) : null}
 
       {configured && !signedIn ? (
-        <Card className="border-border/80 shadow-md">
+        <Card>
           <CardHeader>
             <CardTitle className="text-base">Sign in to load your data</CardTitle>
             <CardDescription>
@@ -124,32 +136,44 @@ export default async function DashboardPage() {
       ) : null}
 
       <Tabs defaultValue="apply" className="w-full">
-        <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-            <LayoutGrid className="size-4 shrink-0 text-primary" aria-hidden />
-            <span>Explore metrics by pillar</span>
-            <DashboardTourDialog />
+        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div className="ch-section-rail space-y-2 border-cyan-500/20">
+            <p className="ch-eyebrow !text-[0.55rem]">Metrics</p>
+            <div className="flex flex-wrap items-center gap-3 font-serif text-sm text-white/55">
+              <LayoutGrid className="size-4 shrink-0 text-cyan-500/70" aria-hidden />
+              <span>Explore by pillar</span>
+              <DashboardTourDialog />
+            </div>
           </div>
         </div>
-        <TabsList className="grid h-auto w-full max-w-xl grid-cols-3 gap-1 rounded-lg bg-muted/60 p-1.5">
-          <TabsTrigger value="apply" className="py-2.5">
+        <TabsList className="grid h-auto w-full max-w-xl grid-cols-3 gap-1 rounded-xl border border-white/10 bg-white/[0.04] p-1.5 backdrop-blur-sm">
+          <TabsTrigger
+            value="apply"
+            className="py-3 font-mono text-[0.65rem] uppercase tracking-[0.18em] data-active:border data-active:border-cyan-500/30 data-active:bg-white/[0.08] data-active:text-cyan-200"
+          >
             Apply
           </TabsTrigger>
-          <TabsTrigger value="bio" className="py-2.5">
+          <TabsTrigger
+            value="bio"
+            className="py-3 font-mono text-[0.65rem] uppercase tracking-[0.18em] data-active:border data-active:border-cyan-500/30 data-active:bg-white/[0.08] data-active:text-cyan-200"
+          >
             Bio-Vault
           </TabsTrigger>
-          <TabsTrigger value="network" className="py-2.5">
+          <TabsTrigger
+            value="network"
+            className="py-3 font-mono text-[0.65rem] uppercase tracking-[0.18em] data-active:border data-active:border-cyan-500/30 data-active:bg-white/[0.08] data-active:text-cyan-200"
+          >
             Network
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="apply" className="mt-6 outline-none">
-          <div className="grid gap-6 lg:grid-cols-5">
-            <Card className="border-border/70 bg-card/80 shadow-md lg:col-span-2">
+        <TabsContent value="apply" className="mt-10 outline-none">
+          <div className="grid gap-8 lg:grid-cols-5">
+            <Card className="lg:col-span-2">
               <CardHeader>
                 <div className="flex items-center gap-2">
-                  <TrendingUp className="size-4 text-primary" aria-hidden />
-                  <CardTitle className="text-base">Pipeline load</CardTitle>
+                  <TrendingUp className="size-4 text-cyan-400/80" aria-hidden />
+                  <CardTitle>Pipeline load</CardTitle>
                 </div>
                 <CardDescription>
                   How your applications are spread across each stage in your
@@ -159,17 +183,17 @@ export default async function DashboardPage() {
               <CardContent className="space-y-4">
                 {pipelineEntries.map(([key, count]) => (
                   <div key={key}>
-                    <div className="mb-1.5 flex items-center justify-between text-sm">
-                      <span className="font-medium text-foreground">
+                    <div className="mb-1.5 flex items-center justify-between font-mono text-xs uppercase tracking-wider text-white/70">
+                      <span className="font-medium text-white/90">
                         {jobLabels[key] ?? key}
                       </span>
-                      <span className="tabular-nums text-muted-foreground">
+                      <span className="tabular-nums text-cyan-500/80">
                         {count}
                       </span>
                     </div>
-                    <div className="h-2.5 overflow-hidden rounded-sm bg-muted/80">
+                    <div className="h-2 overflow-hidden rounded-full bg-white/[0.08]">
                       <div
-                        className="h-full rounded-sm bg-primary transition-all duration-500"
+                        className="h-full rounded-full bg-cyan-500/70 transition-all duration-500"
                         style={{
                           width: `${(count / pipelineMax) * 100}%`,
                         }}
@@ -180,9 +204,9 @@ export default async function DashboardPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-border/70 bg-card/80 shadow-md lg:col-span-3">
+            <Card className="lg:col-span-3">
               <CardHeader>
-                <CardTitle className="text-base">Pipeline distribution</CardTitle>
+                <CardTitle>Pipeline distribution</CardTitle>
                 <CardDescription>
                   Counts update when you add roles or move them between stages.
                 </CardDescription>
@@ -190,14 +214,14 @@ export default async function DashboardPage() {
               <CardContent>
                 <Table>
                   <TableHeader>
-                    <TableRow className="border-border/60 hover:bg-transparent">
+                    <TableRow className="border-white/10 hover:bg-transparent">
                       <TableHead>Stage</TableHead>
                       <TableHead className="text-right">Count</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {pipelineEntries.map(([key, count]) => (
-                      <TableRow key={key} className="border-border/60">
+                      <TableRow key={key} className="border-white/10">
                         <TableCell className="font-medium">
                           {jobLabels[key] ?? key}
                         </TableCell>
@@ -213,30 +237,34 @@ export default async function DashboardPage() {
           </div>
         </TabsContent>
 
-        <TabsContent value="bio" className="mt-6 outline-none">
-          <Card className="border-border/70 bg-card/80 shadow-md">
+        <TabsContent value="bio" className="mt-10 outline-none">
+          <Card>
             <CardHeader>
-              <CardTitle className="text-base">Skill engine depth</CardTitle>
+              <CardTitle>Skill engine depth</CardTitle>
               <CardDescription>
                 Skills, projects, and work history you’ve saved in Bio-Vault.
               </CardDescription>
             </CardHeader>
-            <CardContent className="grid gap-4 sm:grid-cols-2">
-              <div className="rounded-lg border border-border/70 bg-gradient-to-br from-card to-muted/20 p-5 shadow-sm">
-                <p className="text-sm text-muted-foreground">Vault messages</p>
-                <p className="mt-1 text-3xl font-semibold tabular-nums tracking-tight">
+            <CardContent className="grid gap-8 sm:grid-cols-2">
+              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-8 transition-all duration-500 hover:border-cyan-500/25">
+                <p className="font-mono text-[0.65rem] uppercase tracking-[0.2em] text-cyan-500/80">
+                  Vault messages
+                </p>
+                <p className="mt-3 font-serif text-3xl font-light tabular-nums tracking-tight text-white">
                   {stats.bioMessagesCount}
                 </p>
-                <p className="mt-2 text-xs text-muted-foreground">
+                <p className="mt-3 font-serif text-xs font-light leading-relaxed text-white/50">
                   Conversations you’ve had with the career assistant.
                 </p>
               </div>
-              <div className="rounded-lg border border-border/70 bg-gradient-to-br from-card to-muted/20 p-5 shadow-sm">
-                <p className="text-sm text-muted-foreground">Structured atoms</p>
-                <p className="mt-1 text-3xl font-semibold tabular-nums tracking-tight">
+              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-8 transition-all duration-500 hover:border-cyan-500/25">
+                <p className="font-mono text-[0.65rem] uppercase tracking-[0.2em] text-cyan-500/80">
+                  Structured atoms
+                </p>
+                <p className="mt-3 font-serif text-3xl font-light tabular-nums tracking-tight text-white">
                   {stats.skillsCount + stats.projectsCount + stats.experienceCount}
                 </p>
-                <p className="mt-2 text-xs text-muted-foreground">
+                <p className="mt-3 font-serif text-xs font-light leading-relaxed text-white/50">
                   Powers tailored résumés and job fit insights.
                 </p>
               </div>
@@ -244,29 +272,31 @@ export default async function DashboardPage() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="network" className="mt-6 outline-none">
-          <Card className="border-border/70 bg-card/80 shadow-md">
+        <TabsContent value="network" className="mt-10 outline-none">
+          <Card>
             <CardHeader>
-              <CardTitle className="text-base">Relationship graph</CardTitle>
+              <CardTitle>Relationship graph</CardTitle>
               <CardDescription>
                 Contacts and referral paths toward target roles.
               </CardDescription>
             </CardHeader>
-            <CardContent className="grid gap-4 sm:grid-cols-2">
-              <div className="rounded-lg border border-border/70 bg-gradient-to-br from-card to-muted/20 p-5 shadow-sm">
-                <p className="text-sm text-muted-foreground">Contacts</p>
-                <p className="mt-1 text-3xl font-semibold tabular-nums tracking-tight">
+            <CardContent className="grid gap-8 sm:grid-cols-2">
+              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-8 transition-all duration-500 hover:border-cyan-500/25">
+                <p className="font-mono text-[0.65rem] uppercase tracking-[0.2em] text-cyan-500/80">
+                  Contacts
+                </p>
+                <p className="mt-3 font-serif text-3xl font-light tabular-nums tracking-tight text-white">
                   {stats.contactsCount}
                 </p>
               </div>
-              <div className="rounded-lg border border-border/70 bg-gradient-to-br from-card to-muted/20 p-5 shadow-sm">
-                <p className="text-sm text-muted-foreground">
+              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-8 transition-all duration-500 hover:border-cyan-500/25">
+                <p className="font-mono text-[0.65rem] uppercase tracking-[0.2em] text-cyan-500/80">
                   Referral mappings
                 </p>
-                <p className="mt-1 text-3xl font-semibold tabular-nums tracking-tight">
+                <p className="mt-3 font-serif text-3xl font-light tabular-nums tracking-tight text-white">
                   {stats.referralLinksCount}
                 </p>
-                <p className="mt-2 text-xs text-muted-foreground">
+                <p className="mt-3 font-serif text-xs font-light leading-relaxed text-white/50">
                   Links between people and the roles you’re pursuing.
                 </p>
               </div>

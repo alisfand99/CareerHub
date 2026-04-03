@@ -78,7 +78,7 @@ function MindMapFiber({
         strokeDasharray="5 22"
         className={cn(
           "drop-shadow-[0_0_12px_rgba(34,211,238,0.55)]",
-          active && "drop-shadow-[0_0_16px_rgba(192,38,211,0.35)]",
+          active && "drop-shadow-[0_0_14px_rgba(34,211,238,0.35)]",
         )}
       >
         <animate
@@ -138,7 +138,7 @@ function PathEndNode({
 
 function CommandFrameCorners() {
   const corner =
-    "pointer-events-none absolute border-violet-400/40 shadow-[0_0_10px_rgba(192,38,211,0.25)]";
+    "pointer-events-none absolute border-cyan-400/35 shadow-[0_0_12px_rgba(34,211,238,0.2)]";
   return (
     <>
       <span
@@ -172,13 +172,13 @@ function NeuralCoreOrb({
     <motion.button
       type="button"
       onClick={onOpen}
-      className="group/core relative flex size-[7.5rem] shrink-0 items-center justify-center rounded-full outline-none ring-offset-[#0a0514] focus-visible:ring-2 focus-visible:ring-cyan-400/70"
+      className="group/core relative flex size-[7.5rem] shrink-0 items-center justify-center rounded-full outline-none ring-offset-[#050505] focus-visible:ring-2 focus-visible:ring-cyan-400/70"
       aria-label="Open neural command interface"
       animate={{ scale: isPulsing ? 1.04 : 1 }}
       transition={{ type: "spring", stiffness: 260, damping: 22 }}
     >
       <motion.span
-        className="absolute inset-[-36%] rounded-full bg-[radial-gradient(circle,rgba(192,38,211,0.28)_0%,rgba(34,211,238,0.14)_40%,transparent_70%)] blur-xl"
+        className="absolute inset-[-36%] rounded-full bg-[radial-gradient(circle,rgba(34,211,238,0.22)_0%,rgba(6,182,212,0.1)_45%,transparent_70%)] blur-xl"
         animate={{
           opacity: isPulsing ? [0.72, 1, 0.72] : 0.82,
           scale: isPulsing ? [1, 1.06, 1] : 1,
@@ -195,15 +195,15 @@ function NeuralCoreOrb({
         aria-hidden
       />
       <span
-        className="absolute inset-[-14%] rounded-full bg-[radial-gradient(circle_at_85%_50%,rgba(232,121,249,0.45)_0%,transparent_50%)] opacity-90 blur-sm animate-neural-orb-breathe"
+        className="absolute inset-[-14%] rounded-full bg-[radial-gradient(circle_at_85%_50%,rgba(34,211,238,0.25)_0%,transparent_55%)] opacity-90 blur-sm animate-neural-orb-breathe"
         aria-hidden
       />
       <span
-        className="absolute inset-[-8px] rounded-full shadow-[0_0_56px_-4px_rgba(0,255,255,0.25),0_0_80px_-6px_rgba(192,38,211,0.35)]"
+        className="absolute inset-[-8px] rounded-full shadow-[0_0_48px_-4px_rgba(34,211,238,0.35),0_0_72px_-8px_rgba(6,182,212,0.15)]"
         aria-hidden
       />
       <span
-        className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_30%_25%,rgba(255,255,255,0.55)_0%,rgba(34,211,238,0.48)_12%,rgba(59,130,246,0.32)_38%,rgba(45,0,75,0.65)_72%,rgba(2,6,23,0.96)_100%)]"
+        className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_30%_25%,rgba(255,255,255,0.45)_0%,rgba(34,211,238,0.42)_18%,rgba(15,118,110,0.28)_45%,rgba(5,5,8,0.92)_100%)]"
         style={{
           boxShadow:
             "inset 0 0 48px rgba(34,211,238,0.18), inset 0 2px 14px rgba(255,255,255,0.1)",
@@ -256,20 +256,20 @@ export function CircularOrchestratorHub({
 
   return (
     <section
-      className="relative -mx-4 overflow-hidden rounded-3xl bg-gradient-to-br from-[#0a0514] via-[#12081f] to-[#050508] shadow-[0_0_72px_-16px_rgba(192,38,211,0.25),inset_0_0_0_1px_rgba(34,211,238,0.1)] md:-mx-8"
+      className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#080808] via-[#060606] to-[#050505] shadow-[inset_0_0_0_1px_rgba(34,211,238,0.08),0_0_60px_-20px_rgba(34,211,238,0.12)]"
       aria-label="Neural strategic command"
       style={{ letterSpacing: "-0.02em" }}
     >
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_100%_80%_at_0%_50%,rgba(34,211,238,0.12),transparent_50%),radial-gradient(ellipse_80%_70%_at_100%_30%,rgba(168,85,247,0.14),transparent_55%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_100%_80%_at_0%_40%,rgba(34,211,238,0.1),transparent_52%),radial-gradient(ellipse_70%_60%_at_100%_20%,rgba(245,158,11,0.06),transparent_50%)]"
         aria-hidden
       />
       <div
         className="pointer-events-none absolute inset-0 opacity-35 animate-neural-mesh-drift"
         style={{
           backgroundImage: `
-            linear-gradient(rgba(34, 211, 238, 0.04) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(147, 51, 234, 0.035) 1px, transparent 1px)
+            linear-gradient(rgba(34, 211, 238, 0.035) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(34, 211, 238, 0.028) 1px, transparent 1px)
           `,
           backgroundSize: "32px 32px",
           maskImage:
@@ -285,7 +285,7 @@ export function CircularOrchestratorHub({
       <CommandFrameCorners />
 
       <div className="relative z-10 px-4 pb-10 pt-8 md:px-8 md:pb-12 md:pt-10">
-        <h2 className="mb-8 text-center text-sm font-medium uppercase tracking-[0.35em] text-cyan-100/55">
+        <h2 className="mb-10 text-center font-mono text-[0.65rem] font-medium uppercase tracking-[0.4em] text-cyan-500/75">
           Summary
         </h2>
 
@@ -303,9 +303,9 @@ export function CircularOrchestratorHub({
             >
               <defs>
                 <linearGradient id={gradId} x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#22d3ee" stopOpacity="0.75" />
-                  <stop offset="50%" stopColor="#e879f9" stopOpacity="1" />
-                  <stop offset="100%" stopColor="#38bdf8" stopOpacity="0.8" />
+                  <stop offset="0%" stopColor="#22d3ee" stopOpacity="0.65" />
+                  <stop offset="50%" stopColor="#5eead4" stopOpacity="0.95" />
+                  <stop offset="100%" stopColor="#06b6d4" stopOpacity="0.75" />
                 </linearGradient>
                 <filter id={filterId} x="-60%" y="-60%" width="220%" height="220%">
                   <feGaussianBlur stdDeviation="0.5" result="b" />
@@ -422,12 +422,12 @@ function PillarMindCard({
         "border-0 bg-white/[0.035] shadow-none ring-0 backdrop-blur-[14px] backdrop-saturate-150",
         "shadow-[0_12px_48px_-8px_rgba(0,0,0,0.55),0_0_40px_-10px_rgba(34,211,238,0.12),inset_0_1px_0_rgba(255,255,255,0.07)]",
         highlight &&
-          "shadow-[0_14px_52px_-6px_rgba(0,0,0,0.45),0_0_48px_-6px_rgba(34,211,238,0.28),0_0_56px_-8px_rgba(192,38,211,0.15),inset_0_1px_0_rgba(255,255,255,0.1)]",
+          "shadow-[0_14px_52px_-6px_rgba(0,0,0,0.45),0_0_48px_-6px_rgba(34,211,238,0.22),0_0_56px_-8px_rgba(6,182,212,0.12),inset_0_1px_0_rgba(255,255,255,0.08)]",
         "transition-shadow duration-500",
       )}
     >
       <div
-        className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-white/[0.07] via-transparent to-fuchsia-500/[0.04]"
+        className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-white/[0.06] via-transparent to-cyan-500/[0.05]"
         aria-hidden
       />
       <div className="pointer-events-none absolute -right-8 top-0 h-full w-1/2 skew-x-[-12deg] bg-gradient-to-l from-cyan-400/[0.06] to-transparent" />
@@ -440,7 +440,7 @@ function PillarMindCard({
           <span
             className={cn(
               "flex size-11 shrink-0 items-center justify-center rounded-xl",
-              "bg-gradient-to-br from-cyan-500/12 to-fuchsia-600/10",
+              "bg-gradient-to-br from-cyan-500/12 to-teal-600/8",
               "shadow-[0_0_24px_rgba(34,211,238,0.28)]",
               highlight && "shadow-[0_0_32px_rgba(34,211,238,0.5)]",
             )}

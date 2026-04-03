@@ -7,17 +7,15 @@ import { cn } from "@/lib/utils";
 export default function LoginPage() {
   return (
     <HeroBackdrop>
-      <div className="mx-auto flex w-full max-w-lg flex-1 flex-col justify-center px-6 py-16">
-        <header className="mb-10 text-center">
-          <p className="text-sm font-semibold uppercase tracking-wider text-white/90">
-            Career-Hub AI
-          </p>
-          <h1 className="mt-3 text-3xl font-bold tracking-tight text-white drop-shadow-sm md:text-4xl">
-            Welcome back
+      <div className="mx-auto flex w-full max-w-lg flex-1 flex-col justify-center px-6 py-16 md:py-24">
+        <header className="ch-section-rail mb-10 border-cyan-500/25 text-center md:text-left">
+          <p className="ch-eyebrow">Career-Hub AI</p>
+          <h1 className="ch-display mt-4">
+            Welcome <span className="text-white/35">back.</span>
           </h1>
-          <p className="mx-auto mt-2 max-w-md text-sm text-white/80">
-            Sign in to open your dashboard. Your information stays private to
-            your account.
+          <p className="ch-body mx-auto mt-4 max-w-md md:mx-0">
+            Sign in to open your command center. Your information stays private
+            to your account.
           </p>
         </header>
 
@@ -27,7 +25,7 @@ export default function LoginPage() {
           href="/"
           className={cn(
             buttonVariants({ variant: "ghost", size: "sm" }),
-            "mt-10 self-center border border-white/20 bg-white/5 text-white/90 hover:bg-white/10 hover:text-white",
+            "mt-12 self-center md:self-start",
           )}
         >
           Back to dashboard

@@ -52,28 +52,32 @@ export function LoginForm() {
   }
 
   const inputClass = cn(
-    "box-border w-full min-h-12 rounded-sm border border-slate-300 bg-white px-3 py-2.5 text-base text-slate-900 shadow-sm",
-    "placeholder:text-slate-400 outline-none transition-colors",
-    "focus-visible:border-brand-action focus-visible:ring-2 focus-visible:ring-brand-action/25",
-    "disabled:cursor-not-allowed disabled:bg-slate-50 disabled:opacity-60",
+    "box-border w-full min-h-12 rounded-lg border border-white/12 bg-white/[0.04] px-3 py-2.5 font-mono text-sm text-white shadow-none backdrop-blur-sm",
+    "placeholder:text-white/35 outline-none transition-all duration-500",
+    "focus-visible:border-cyan-500/45 focus-visible:ring-2 focus-visible:ring-cyan-400/20",
+    "disabled:cursor-not-allowed disabled:opacity-45",
   );
 
   return (
     <div
       className={cn(
-        "mx-auto w-full max-w-md rounded-sm border border-slate-200/90 bg-white p-8 shadow-xl md:p-10",
+        "ch-glass-card mx-auto w-full max-w-md p-8 md:p-10",
+        "before:from-cyan-500/[0.06]",
       )}
     >
-      <h2 className="text-lg font-bold tracking-tight text-brand-navy">
+      <h2 className="font-serif text-xl font-medium tracking-tight text-white md:text-2xl">
         Sign in
       </h2>
-      <p className="mt-1 text-sm text-slate-600">
+      <p className="mt-2 font-serif text-sm font-light leading-relaxed text-white/60">
         Use the email and password you use for Career Hub.
       </p>
 
-      <form onSubmit={onSubmit} className="mt-8 flex w-full flex-col gap-5">
+      <form onSubmit={onSubmit} className="relative z-[1] mt-8 flex w-full flex-col gap-6">
         <div className="flex w-full flex-col gap-2">
-          <Label htmlFor="login-email" className="text-sm font-medium text-slate-700">
+          <Label
+            htmlFor="login-email"
+            className="font-mono text-[0.65rem] font-medium uppercase tracking-[0.22em] text-cyan-500/90"
+          >
             Email
           </Label>
           <input
@@ -92,7 +96,7 @@ export function LoginForm() {
         <div className="flex w-full flex-col gap-2">
           <Label
             htmlFor="login-password"
-            className="text-sm font-medium text-slate-700"
+            className="font-mono text-[0.65rem] font-medium uppercase tracking-[0.22em] text-cyan-500/90"
           >
             Password
           </Label>
@@ -109,30 +113,23 @@ export function LoginForm() {
           />
         </div>
 
-        <Button
-          type="submit"
-          disabled={loading}
-          className={cn(
-            "mt-1 h-12 w-full rounded-sm border-0 bg-brand-action text-base font-semibold text-white shadow-sm",
-            "hover:bg-brand-action-hover focus-visible:ring-brand-action/40",
-          )}
-        >
-          {loading ? "Signing in…" : "Sign in"}
-        </Button>
-
         {message ? (
           <p
-            role="alert"
             className={cn(
-              "rounded-sm px-3 py-2.5 text-sm leading-relaxed",
+              "rounded-lg border px-3 py-2 font-mono text-xs leading-relaxed",
               isError
-                ? "bg-red-50 text-red-800 ring-1 ring-red-200"
-                : "bg-slate-50 text-slate-600 ring-1 ring-slate-200",
+                ? "border-red-500/30 bg-red-500/10 text-red-200/90"
+                : "border-white/10 bg-white/[0.04] text-white/75",
             )}
+            role="status"
           >
             {message}
           </p>
         ) : null}
+
+        <Button type="submit" className="w-full" disabled={loading}>
+          {loading ? "Signing in…" : "Sign in"}
+        </Button>
       </form>
     </div>
   );

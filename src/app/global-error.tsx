@@ -22,7 +22,7 @@ export default function GlobalError({
 
   return (
     <html lang="en">
-      <body className="min-h-screen bg-background font-sans text-foreground antialiased">
+      <body className="min-h-screen bg-[#050505] font-serif text-foreground antialiased">
         <div className="mx-auto flex min-h-screen max-w-lg flex-col items-center justify-center gap-6 px-6 py-16 text-center">
           <div className="space-y-2">
             <h1 className="text-lg font-semibold tracking-tight">

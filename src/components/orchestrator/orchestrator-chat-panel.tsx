@@ -70,20 +70,23 @@ export function OrchestratorChatPanel() {
 
   const contextHint =
     pathname.startsWith("/apply-hub") ? (
-      <p className="rounded-md border border-primary/20 bg-primary/5 px-3 py-2 text-xs text-foreground">
-        <span className="font-medium">Tip:</span> Found a role? Click{" "}
-        <strong>Found a Job</strong>, then paste the posting below.
+      <p className="rounded-lg border border-cyan-500/25 bg-cyan-500/[0.06] px-3 py-2 font-mono text-[0.65rem] leading-relaxed text-white/80">
+        <span className="text-cyan-400/90">Tip:</span> Found a role? Click{" "}
+        <strong className="text-white">Found a Job</strong>, then paste the
+        posting below.
       </p>
     ) : pathname.startsWith("/network") ? (
-      <p className="rounded-md border border-primary/20 bg-primary/5 px-3 py-2 text-xs text-foreground">
-        <span className="font-medium">Tip:</span> Ready to connect? Try{" "}
-        <strong>Outreach Script</strong> for a tailored draft.
+      <p className="rounded-lg border border-cyan-500/25 bg-cyan-500/[0.06] px-3 py-2 font-mono text-[0.65rem] leading-relaxed text-white/80">
+        <span className="text-cyan-400/90">Tip:</span> Ready to connect? Try{" "}
+        <strong className="text-white">Outreach Script</strong> for a tailored
+        draft.
       </p>
     ) : pathname.startsWith("/bio-vault") ? (
-      <p className="rounded-md border border-primary/20 bg-primary/5 px-3 py-2 text-xs text-foreground">
-        <span className="font-medium">Tip:</span> Pasting a full CV? Click{" "}
-        <strong>Import résumé</strong>, then paste your text — or paste
-        directly; long profile text is treated as a Bio-Vault import.
+      <p className="rounded-lg border border-cyan-500/25 bg-cyan-500/[0.06] px-3 py-2 font-mono text-[0.65rem] leading-relaxed text-white/80">
+        <span className="text-cyan-400/90">Tip:</span> Pasting a full CV? Click{" "}
+        <strong className="text-white">Import résumé</strong>, then paste your
+        text — or paste directly; long profile text is treated as a Bio-Vault
+        import.
       </p>
     ) : null;
 
@@ -91,22 +94,22 @@ export function OrchestratorChatPanel() {
     <>
       <div
         className={cn(
-          "fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col border-l border-border bg-background/98 shadow-2xl backdrop-blur-md transition-transform duration-300 ease-out",
+          "fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col border-l border-white/10 bg-[#080808]/95 shadow-2xl backdrop-blur-xl transition-transform duration-300 ease-out",
           open ? "translate-x-0" : "translate-x-full pointer-events-none",
         )}
         aria-hidden={!open}
       >
-        <header className="flex shrink-0 items-center justify-between gap-3 border-b border-border px-4 py-3">
+        <header className="flex shrink-0 items-center justify-between gap-3 border-b border-white/[0.08] px-4 py-3">
           <div className="flex items-center gap-2">
-            <div className="flex size-9 items-center justify-center rounded-lg bg-primary/15 text-primary">
+            <div className="flex size-9 items-center justify-center rounded-lg border border-cyan-500/25 bg-cyan-500/10 text-cyan-300">
               <MessageSquare className="size-4" aria-hidden />
             </div>
             <div>
-              <p className="text-sm font-semibold tracking-tight">
+              <p className="font-serif text-sm font-medium tracking-tight text-white">
                 Career assistant
               </p>
-              <p className="text-xs text-muted-foreground">
-                Jobs · Bio-Vault · Network
+              <p className="font-mono text-[0.6rem] uppercase tracking-[0.28em] text-cyan-500/70">
+                Jobs · Bio · Network
               </p>
             </div>
           </div>
@@ -134,14 +137,14 @@ export function OrchestratorChatPanel() {
 
         <ScrollArea className="min-h-0 flex-1 px-3 py-3">
           {messages.length === 0 ? (
-            <div className="space-y-3 rounded-lg border border-dashed border-border/80 bg-muted/20 p-4 text-sm text-muted-foreground">
-              <p className="font-medium text-foreground">How to use it</p>
+            <div className="space-y-3 rounded-xl border border-dashed border-white/15 bg-white/[0.03] p-4 font-serif text-sm font-light leading-relaxed text-white/60">
+              <p className="font-medium text-white/90">How to use it</p>
               <p>
                 Pick a shortcut or type freely. The assistant updates your
                 pipeline, skills, and contacts when it recognizes a request, and
                 shows a short summary of what changed.
               </p>
-              <p className="text-xs">
+              <p className="font-mono text-[0.65rem] text-white/45">
                 Smart replies need the AI service enabled for this deployment.
               </p>
             </div>
@@ -151,10 +154,10 @@ export function OrchestratorChatPanel() {
                 <li
                   key={m.id}
                   className={cn(
-                    "rounded-lg px-3 py-2.5 text-sm leading-relaxed",
+                    "rounded-xl px-3 py-2.5 text-sm leading-relaxed transition-colors duration-500",
                     m.role === "user"
-                      ? "ml-4 bg-primary/10 text-foreground"
-                      : "mr-4 border border-border/60 bg-card/80 text-muted-foreground",
+                      ? "ml-4 border border-cyan-500/20 bg-cyan-500/10 font-serif text-white/90"
+                      : "mr-4 border border-white/10 bg-white/[0.05] font-serif font-light text-white/70",
                   )}
                 >
                   {m.content}
@@ -169,11 +172,11 @@ export function OrchestratorChatPanel() {
         </ScrollArea>
 
         {lastOutreach ? (
-          <div className="shrink-0 border-t border-border bg-muted/30 px-3 py-2">
-            <p className="text-xs font-medium text-foreground">
+          <div className="shrink-0 border-t border-white/[0.08] bg-white/[0.03] px-3 py-2">
+            <p className="font-mono text-[0.65rem] font-medium uppercase tracking-wider text-cyan-500/80">
               Latest outreach draft
             </p>
-            <p className="mt-1 max-h-24 overflow-y-auto text-xs text-muted-foreground">
+            <p className="mt-1 max-h-24 overflow-y-auto font-mono text-xs text-white/55">
               {lastOutreach}
             </p>
             <Button
@@ -190,9 +193,9 @@ export function OrchestratorChatPanel() {
           </div>
         ) : null}
 
-        <div className="shrink-0 space-y-2 border-t border-border bg-muted/10 px-3 py-2">
+        <div className="shrink-0 space-y-2 border-t border-white/[0.08] bg-[#060606]/90 px-3 py-3">
           {contextHint}
-          <p className="text-[0.65rem] font-semibold uppercase tracking-wider text-muted-foreground">
+          <p className="font-mono text-[0.6rem] font-semibold uppercase tracking-[0.28em] text-white/40">
             Quick actions
           </p>
           <div className="flex flex-wrap gap-1.5">
@@ -202,7 +205,7 @@ export function OrchestratorChatPanel() {
                 type="button"
                 variant="secondary"
                 size="sm"
-                className="h-auto min-h-8 whitespace-normal px-2 py-1.5 text-left text-[0.7rem] leading-tight"
+                className="h-auto min-h-8 whitespace-normal border-white/10 px-2 py-1.5 text-left text-[0.7rem] normal-case leading-tight tracking-normal"
                 disabled={busy}
                 onClick={() => {
                   setInput((cur) => a.fill(cur));

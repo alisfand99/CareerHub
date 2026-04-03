@@ -1,11 +1,19 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { JetBrains_Mono, Lora } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 
-const inter = Inter({
+const lora = Lora({
   subsets: ["latin"],
-  variable: "--font-sans",
+  variable: "--font-serif",
+  display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  weight: ["400", "500", "600"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -14,7 +22,7 @@ export const metadata: Metadata = {
     template: "%s · Career-Hub AI",
   },
   description:
-    "Dynamic career intelligence: applications, Bio-Vault skill engine, and network CRM.",
+    "Command center for career intelligence: applications, Bio-Vault, and network CRM.",
 };
 
 export default function RootLayout({
@@ -23,8 +31,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn("dark", inter.variable)}>
-      <body className="min-h-screen antialiased">{children}</body>
+    <html
+      lang="en"
+      className={cn("dark", lora.variable, jetbrainsMono.variable)}
+    >
+      <body className="min-h-screen">{children}</body>
     </html>
   );
 }
