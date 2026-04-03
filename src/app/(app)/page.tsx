@@ -116,10 +116,10 @@ export default async function DashboardPage() {
 
       {configured ? (
         <div className="flex w-full min-w-0 flex-col gap-12 md:gap-16">
-          <div className="flex flex-col gap-4 border-b border-slate-900/10 pb-8 md:flex-row md:items-end md:justify-between">
+          <div className="flex flex-col gap-4 border-b border-white/[0.06] pb-8 md:flex-row md:items-end md:justify-between">
             <div className="ch-section-rail min-w-0 space-y-2 border-cyan-500/20">
               <p className="ch-eyebrow !text-[0.55rem]">Metrics</p>
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-2 font-serif text-sm text-slate-600/70">
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-2 font-serif text-sm text-white/55">
                 <LayoutGrid className="size-4 shrink-0 text-cyan-500/70" aria-hidden />
                 <span>Explore by pillar</span>
                 <DashboardTourDialog />
@@ -148,15 +148,15 @@ export default async function DashboardPage() {
               <CardContent className="space-y-4">
                 {pipelineEntries.map(([key, count]) => (
                   <div key={key}>
-                    <div className="mb-1.5 flex items-center justify-between font-mono text-xs uppercase tracking-wider text-slate-600/80">
-                      <span className="font-medium text-slate-900">
+                    <div className="mb-1.5 flex items-center justify-between font-mono text-xs uppercase tracking-wider text-white/70">
+                      <span className="font-medium text-white/90">
                         {jobLabels[key] ?? key}
                       </span>
                       <span className="tabular-nums text-cyan-500/80">
                         {count}
                       </span>
                     </div>
-                    <div className="h-2 overflow-hidden rounded-full bg-slate-900/6">
+                    <div className="h-2 overflow-hidden rounded-full bg-white/[0.08]">
                       <div
                         className="h-full rounded-full bg-cyan-500/70 transition-all duration-500"
                         style={{
@@ -185,27 +185,27 @@ export default async function DashboardPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="grid gap-8 sm:grid-cols-2">
-                <div className="min-w-0 rounded-xl border border-slate-900/10 bg-white/70 p-6 transition-all duration-500 hover:border-cyan-500/30 sm:p-8">
+                <div className="min-w-0 rounded-xl border border-white/10 bg-white/[0.03] p-6 transition-all duration-500 hover:border-cyan-500/25 sm:p-8">
                   <p className="font-mono text-[0.65rem] uppercase tracking-[0.2em] text-cyan-500/80">
                     Vault messages
                   </p>
-                  <p className="mt-3 font-serif text-3xl font-light tabular-nums tracking-tight text-slate-900">
+                  <p className="mt-3 font-serif text-3xl font-light tabular-nums tracking-tight text-white">
                     {stats.bioMessagesCount}
                   </p>
-                  <p className="mt-3 font-serif text-xs font-light leading-relaxed text-slate-600/70">
+                  <p className="mt-3 font-serif text-xs font-light leading-relaxed text-white/50">
                     Conversations you’ve had with the career assistant.
                   </p>
                 </div>
-                <div className="min-w-0 rounded-xl border border-slate-900/10 bg-white/70 p-6 transition-all duration-500 hover:border-cyan-500/30 sm:p-8">
+                <div className="min-w-0 rounded-xl border border-white/10 bg-white/[0.03] p-6 transition-all duration-500 hover:border-cyan-500/25 sm:p-8">
                   <p className="font-mono text-[0.65rem] uppercase tracking-[0.2em] text-cyan-500/80">
                     Structured atoms
                   </p>
-                  <p className="mt-3 font-serif text-3xl font-light tabular-nums tracking-tight text-slate-900">
+                  <p className="mt-3 font-serif text-3xl font-light tabular-nums tracking-tight text-white">
                     {stats.skillsCount +
                       stats.projectsCount +
                       stats.experienceCount}
                   </p>
-                  <p className="mt-3 font-serif text-xs font-light leading-relaxed text-slate-600/70">
+                  <p className="mt-3 font-serif text-xs font-light leading-relaxed text-white/50">
                     Powers tailored résumés and job fit insights.
                   </p>
                 </div>
@@ -228,22 +228,22 @@ export default async function DashboardPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="grid gap-8 sm:grid-cols-2">
-                <div className="min-w-0 rounded-xl border border-slate-900/10 bg-white/70 p-6 transition-all duration-500 hover:border-cyan-500/30 sm:p-8">
+                <div className="min-w-0 rounded-xl border border-white/10 bg-white/[0.03] p-6 transition-all duration-500 hover:border-cyan-500/25 sm:p-8">
                   <p className="font-mono text-[0.65rem] uppercase tracking-[0.2em] text-cyan-500/80">
                     Contacts
                   </p>
-                  <p className="mt-3 font-serif text-3xl font-light tabular-nums tracking-tight text-slate-900">
+                  <p className="mt-3 font-serif text-3xl font-light tabular-nums tracking-tight text-white">
                     {stats.contactsCount}
                   </p>
                 </div>
-                <div className="min-w-0 rounded-xl border border-slate-900/10 bg-white/70 p-6 transition-all duration-500 hover:border-cyan-500/30 sm:p-8">
+                <div className="min-w-0 rounded-xl border border-white/10 bg-white/[0.03] p-6 transition-all duration-500 hover:border-cyan-500/25 sm:p-8">
                   <p className="font-mono text-[0.65rem] uppercase tracking-[0.2em] text-cyan-500/80">
                     Referral mappings
                   </p>
-                  <p className="mt-3 font-serif text-3xl font-light tabular-nums tracking-tight text-slate-900">
+                  <p className="mt-3 font-serif text-3xl font-light tabular-nums tracking-tight text-white">
                     {stats.referralLinksCount}
                   </p>
-                  <p className="mt-3 font-serif text-xs font-light leading-relaxed text-slate-600/70">
+                  <p className="mt-3 font-serif text-xs font-light leading-relaxed text-white/50">
                     Links between people and the roles you’re pursuing.
                   </p>
                 </div>

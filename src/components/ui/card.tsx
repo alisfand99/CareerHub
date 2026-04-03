@@ -13,7 +13,7 @@ function Card({
       data-size={size}
       className={cn(
         "group/card ch-glass-card flex flex-col gap-4 py-6 text-sm text-card-foreground has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-4 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl",
-        "before:pointer-events-none before:absolute before:inset-0 before:rounded-xl before:bg-gradient-to-br before:from-cyan-500/[0.05] before:to-transparent before:opacity-70",
+        "before:pointer-events-none before:absolute before:inset-0 before:rounded-xl before:bg-gradient-to-br before:from-cyan-500/[0.07] before:to-transparent before:opacity-70",
         className
       )}
       {...props}
@@ -39,7 +39,7 @@ function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="card-title"
       className={cn(
-        "font-serif text-lg font-normal leading-snug tracking-tight text-[var(--text)] group-data-[size=sm]/card:text-base",
+        "font-serif text-lg font-normal leading-snug tracking-tight text-white group-data-[size=sm]/card:text-base",
         className
       )}
       {...props}
@@ -51,7 +51,7 @@ function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="card-description"
-      className={cn("font-serif text-sm font-light leading-relaxed text-[var(--muted)]", className)}
+      className={cn("font-serif text-sm font-light leading-relaxed text-white/65", className)}
       {...props}
     />
   )
@@ -85,7 +85,7 @@ function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="card-footer"
       className={cn(
-        "relative z-[1] flex items-center rounded-b-xl border-t border-slate-900/10 bg-white/[0.65] p-6 group-data-[size=sm]/card:p-4",
+        "relative z-[1] flex items-center rounded-b-xl border-t border-white/10 bg-white/[0.03] p-6 group-data-[size=sm]/card:p-4",
         className
       )}
       {...props}

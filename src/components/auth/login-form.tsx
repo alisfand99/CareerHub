@@ -52,8 +52,8 @@ export function LoginForm() {
   }
 
   const inputClass = cn(
-    "box-border w-full min-h-12 rounded-lg border border-slate-900/10 bg-white/70 px-3 py-2.5 font-mono text-sm text-slate-900 shadow-none backdrop-blur-sm",
-    "placeholder:text-slate-600/35 outline-none transition-all duration-500",
+    "box-border w-full min-h-12 rounded-lg border border-white/12 bg-white/[0.04] px-3 py-2.5 font-mono text-sm text-white shadow-none backdrop-blur-sm",
+    "placeholder:text-white/35 outline-none transition-all duration-500",
     "focus-visible:border-cyan-500/45 focus-visible:ring-2 focus-visible:ring-cyan-400/20",
     "disabled:cursor-not-allowed disabled:opacity-45",
   );
@@ -65,10 +65,10 @@ export function LoginForm() {
         "before:from-cyan-500/[0.06]",
       )}
     >
-      <h2 className="font-serif text-xl font-medium tracking-tight text-slate-900 md:text-2xl">
+      <h2 className="font-serif text-xl font-medium tracking-tight text-white md:text-2xl">
         Sign in
       </h2>
-      <p className="mt-2 font-serif text-sm font-light leading-relaxed text-slate-600/70">
+      <p className="mt-2 font-serif text-sm font-light leading-relaxed text-white/60">
         Use the email and password you use for Career Hub.
       </p>
 
@@ -118,8 +118,8 @@ export function LoginForm() {
             className={cn(
               "rounded-lg border px-3 py-2 font-mono text-xs leading-relaxed",
               isError
-                ? "border-red-500/30 bg-red-500/10 text-red-700/90"
-                : "border-slate-900/10 bg-white/70 text-slate-900/75",
+                ? "border-red-500/30 bg-red-500/10 text-red-200/90"
+                : "border-white/10 bg-white/[0.04] text-white/75",
             )}
             role="status"
           >

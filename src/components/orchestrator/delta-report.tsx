@@ -15,12 +15,12 @@ function Row({
   return (
     <div
       className={cn(
-        "flex items-center justify-between gap-3 rounded-lg border border-slate-900/10 bg-white/[0.7] px-2.5 py-1.5 font-mono text-[0.65rem] uppercase tracking-wider",
+        "flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1.5 font-mono text-[0.65rem] uppercase tracking-wider",
         positive && "border-cyan-500/25 bg-cyan-500/[0.08]",
       )}
     >
-      <span className="text-slate-600/60">{label}</span>
-      <span className="font-semibold tabular-nums normal-case tracking-normal text-cyan-700/90">
+      <span className="text-white/50">{label}</span>
+      <span className="font-semibold tabular-nums normal-case tracking-normal text-cyan-200/90">
         {value}
       </span>
     </div>
@@ -119,7 +119,7 @@ export function DeltaReport({
   return (
     <div
       className={cn(
-        "mt-2 space-y-1.5 rounded-xl border border-cyan-500/25 bg-cyan-500/[0.06] p-2",
+        "mt-2 space-y-1.5 rounded-xl border border-cyan-500/20 bg-cyan-500/[0.06] p-2",
         className,
       )}
     >
