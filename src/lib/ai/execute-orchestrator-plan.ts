@@ -239,6 +239,10 @@ export async function executeOrchestratorPlan(
   const record_ids: Record<string, string> = {};
   let insights: Record<string, unknown> | undefined;
   let outreach: OrchestratorExecutionResult["outreach"];
+  // Start from the model's reply but allow server-side warnings to augment it
+  let assistantMessage = plan.assistant_message;
+  const conflicts: { section: string; note: string }[] = [];
+  let dedupedExperiences = 0;
 
   await logBioVault(supabase, userId, "user", userMessage, {
     source: "orchestrator",
@@ -383,6 +387,11 @@ export async function executeOrchestratorPlan(
           updated_tables.push("master_skills");
         }
 
+        const { data: existingExps } = await supabase
+          .from("experience_blocks")
+          .select("id, title, organization, start_date, end_date, is_current")
+          .eq("user_id", userId);
+
         const experienceItems =
           plan.experiences && plan.experiences.length > 0
             ? plan.experiences.filter((e) => e.title?.trim())
@@ -392,16 +401,49 @@ export async function executeOrchestratorPlan(
 
         let firstExpId: string | undefined;
         for (const ex of experienceItems) {
+          const title = ex.title?.trim();
+          if (!title) continue;
           const isCurrent = Boolean(ex.is_current);
+          const organization = ex.organization?.trim() ?? null;
+          const startDate = parseIsoDate(ex.start_date);
+          const endDate = isCurrent ? null : parseIsoDate(ex.end_date);
+
+          const normTitle = title.toLowerCase();
+          const normOrg = organization?.toLowerCase() ?? null;
+
+          const match = existingExps?.find((e) => {
+            const eTitle = (e.title ?? "").trim().toLowerCase();
+            const eOrg = (e.organization ?? "").trim().toLowerCase();
+            const orgMatch = !normOrg || !eOrg ? true : eOrg === normOrg;
+            return eTitle === normTitle && orgMatch;
+          });
+
+          if (match) {
+            const sameDates =
+              ((match.start_date as string | null) ?? null) === startDate &&
+              ((match.end_date as string | null) ?? null) === endDate &&
+              Boolean(match.is_current) === isCurrent;
+            if (sameDates) {
+              dedupedExperiences += 1;
+              continue;
+            }
+            conflicts.push({
+              section: "experience",
+              note: `Different dates for "${title}" at ${
+                organization ?? "unspecified org"
+              }. Kept both entries; review the timeline in Bio-Vault.`,
+            });
+          }
+
           const { data: exp, error } = await supabase
             .from("experience_blocks")
             .insert({
               user_id: userId,
-              title: ex.title.trim(),
-              organization: ex.organization?.trim() ?? null,
+              title,
+              organization,
               location: ex.location?.trim() ?? null,
-              start_date: parseIsoDate(ex.start_date),
-              end_date: isCurrent ? null : parseIsoDate(ex.end_date),
+              start_date: startDate,
+              end_date: endDate,
               is_current: isCurrent,
               bullets: ex.bullets ?? [],
               raw_ingest:
@@ -436,22 +478,45 @@ export async function executeOrchestratorPlan(
           if (Object.keys(clean).length > 0) {
             const { data: exists } = await supabase
               .from("profiles")
-              .select("id")
+              .select(
+                "id, display_name, headline, summary, phone, location, website, public_email",
+              )
               .eq("id", userId)
               .maybeSingle();
             if (exists?.id) {
+              const toUpdate: Record<string, string> = {};
+              for (const [key, value] of Object.entries(clean)) {
+                const existingVal = (exists as Record<string, unknown>)[key];
+                if (
+                  typeof existingVal === "string" &&
+                  existingVal.trim().length > 0 &&
+                  existingVal.trim() !== value
+                ) {
+                  conflicts.push({
+                    section: "profile",
+                    note: `Field "${key}" differs from what you already saved. Kept the existing value; edit your profile if you prefer the new version.`,
+                  });
+                  continue;
+                }
+                toUpdate[key] = value;
+              }
+              if (Object.keys(toUpdate).length === 0) {
+                // Everything conflicted with existing non-empty values; leave profile unchanged.
+              } else {
+                const { error: pe } = await supabase
+                  .from("profiles")
+                  .update(toUpdate)
+                  .eq("id", userId);
+                if (pe) throw pe;
+                updated_tables.push("profiles");
+              }
+            } else {
               const { error: pe } = await supabase
                 .from("profiles")
-                .update(clean)
-                .eq("id", userId);
-              if (pe) throw pe;
-            } else {
-              const { error: pi } = await supabase
-                .from("profiles")
                 .insert({ id: userId, ...clean });
-              if (pi) throw pi;
+              if (pe) throw pe;
+              updated_tables.push("profiles");
             }
-            updated_tables.push("profiles");
           }
         }
 
@@ -626,7 +691,30 @@ export async function executeOrchestratorPlan(
         break;
     }
 
-    await logBioVault(supabase, userId, "assistant", plan.assistant_message, {
+    if (dedupedExperiences > 0) {
+      conflicts.push({
+        section: "experience",
+        note: `Skipped ${dedupedExperiences} experience block${
+          dedupedExperiences > 1 ? "s" : ""
+        } that looked identical to existing entries.`,
+      });
+    }
+
+    if (conflicts.length > 0) {
+      const summaryLines = conflicts.map(
+        (c) => `- [${c.section}] ${c.note}`,
+      );
+      assistantMessage =
+        (assistantMessage?.trim() || "Update complete.") +
+        "\n\nReview points:\n" +
+        summaryLines.join("\n");
+      insights = {
+        ...(insights ?? {}),
+        conflicts,
+      };
+    }
+
+    await logBioVault(supabase, userId, "assistant", assistantMessage, {
       intent: plan.intent,
       updated_tables,
       record_ids,
@@ -638,7 +726,7 @@ export async function executeOrchestratorPlan(
     return {
       ok: true,
       intent: plan.intent,
-      assistant_message: plan.assistant_message,
+      assistant_message: assistantMessage,
       updated_tables,
       insights,
       record_ids,
