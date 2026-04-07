@@ -318,10 +318,10 @@ export function ApplyHubBoard({ initialJobs }: { initialJobs: JobRow[] }) {
             </div>
 
             <div className="w-full min-w-0 p-3 sm:p-4 md:p-5">
-              <div className="-mx-1 overflow-x-auto px-1 pb-2 [-webkit-overflow-scrolling:touch] lg:mx-0 lg:overflow-x-visible lg:px-0 lg:pb-0">
+              <div className="-mx-1 overflow-x-auto px-1 pb-2 [-webkit-overflow-scrolling:touch] lg:mx-0 lg:overflow-x-auto lg:px-0 lg:pb-0">
                 <div
                   className={cn(
-                    "relative flex w-max min-w-full gap-5 lg:grid lg:w-full lg:min-w-0 lg:gap-5 lg:[grid-template-columns:repeat(4,minmax(280px,1fr))]",
+                    "relative flex w-max min-w-full gap-4 lg:grid lg:w-full lg:min-w-0 lg:gap-4 lg:[grid-template-columns:repeat(4,minmax(240px,1fr))]",
                     showPipelinePulse && "min-h-[200px]",
                   )}
                 >
@@ -390,7 +390,7 @@ export function ApplyHubBoard({ initialJobs }: { initialJobs: JobRow[] }) {
             </div>
           </div>
 
-          <aside className="w-full min-w-0 shrink-0 border-t border-slate-100 bg-slate-50/70 p-5 lg:max-w-md lg:basis-0 lg:flex-[1] lg:border-l lg:border-t-0 lg:pl-6">
+          <aside className="w-full min-w-0 shrink-0 border-t border-slate-100 bg-slate-50/70 p-4 lg:max-w-[300px] lg:basis-0 lg:flex-[0.92] lg:border-l lg:border-t-0 lg:p-4">
             <MatchDonutOverview
               avgPct={avgPct}
               highBandCount={highBandCount}
