@@ -161,6 +161,8 @@ export function SuperResumeEditor({
         </p>
       </header>
 
+      <TailoredResumeBuilder jobs={jobs} />
+
       <div className="rounded-2xl border border-cyan-100/80 bg-white/90 p-6 shadow-[0_24px_80px_-40px_rgba(15,23,42,0.1)] backdrop-blur-sm md:p-8">
       {dataLoadWarning ? (
         <div
@@ -179,8 +181,6 @@ export function SuperResumeEditor({
       ) : null}
 
       <ProfileHeaderCard profile={p} userId={userId} userEmail={userEmail} run={run} />
-
-      <TailoredResumeBuilder jobs={jobs} />
 
       <SectionShell
         icon={Briefcase}
@@ -537,7 +537,11 @@ function TailoredResumeBuilder({ jobs }: { jobs: BioVaultJobOption[] }) {
   const selectedJob = jobs.find((j) => j.id === selectedJobId) ?? null;
 
   return (
-    <Card className="border-cyan-200/80 bg-cyan-50/40 shadow-md">
+    <section className="rounded-2xl border border-cyan-300/70 bg-gradient-to-br from-cyan-50 via-white to-sky-50 p-5 shadow-[0_20px_50px_-30px_rgba(14,116,144,0.45)] md:p-6">
+      <p className="mb-3 inline-flex rounded-full border border-cyan-300/70 bg-cyan-100 px-2.5 py-1 font-mono text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-cyan-800">
+        Separate feature
+      </p>
+      <Card className="border-cyan-200/90 bg-white/95 shadow-sm">
       <CardHeader>
         <CardTitle className="text-base">Targeted resume builder</CardTitle>
         <CardDescription>
@@ -636,7 +640,8 @@ function TailoredResumeBuilder({ jobs }: { jobs: BioVaultJobOption[] }) {
           </>
         )}
       </CardContent>
-    </Card>
+      </Card>
+    </section>
   );
 }
 
