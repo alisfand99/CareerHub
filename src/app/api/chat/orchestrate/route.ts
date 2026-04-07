@@ -153,23 +153,74 @@ export async function POST(req: Request) {
 
   const { data: skillRows } = await supabase
     .from("master_skills")
-    .select("name")
+    .select("name, proficiency")
     .eq("user_id", user.id);
 
   const { data: jobRows } = await supabase
     .from("jobs")
-    .select("title, company")
+    .select("title, company, status, ai_match_score")
     .eq("user_id", user.id)
     .order("updated_at", { ascending: false })
     .limit(20);
 
+  const [{ data: profileRow }, { data: experienceRows }, { data: projectRows }] =
+    await Promise.all([
+      supabase
+        .from("profiles")
+        .select("display_name, headline, summary")
+        .eq("id", user.id)
+        .maybeSingle(),
+      supabase
+        .from("experience_blocks")
+        .select("title, organization")
+        .eq("user_id", user.id)
+        .order("start_date", { ascending: false, nullsFirst: false })
+        .limit(20),
+      supabase
+        .from("projects")
+        .select("name, summary")
+        .eq("user_id", user.id)
+        .order("updated_at", { ascending: false })
+        .limit(20),
+    ]);
+
   const skillNames = skillRows?.map((r) => r.name) ?? [];
-  const jobsSummary = jobRows ?? [];
+  const jobsSummary = (jobRows ?? []).map((j) => ({
+    title: j.title,
+    company: j.company,
+  }));
 
   try {
     const plan = await generateOrchestratorPlan(message, {
       skillNames,
       jobsSummary,
+      profileSnapshot: profileRow
+        ? {
+            displayName: profileRow.display_name,
+            headline: profileRow.headline,
+            summary: profileRow.summary,
+          }
+        : null,
+      skillsSnapshot: (skillRows ?? []).map((s) => ({
+        name: s.name,
+        proficiency:
+          typeof s.proficiency === "number" ? s.proficiency : null,
+      })),
+      experienceSnapshot: (experienceRows ?? []).map((e) => ({
+        title: e.title,
+        organization: e.organization,
+      })),
+      projectSnapshot: (projectRows ?? []).map((p) => ({
+        name: p.name,
+        summary: p.summary,
+      })),
+      jobsSnapshot: (jobRows ?? []).map((j) => ({
+        title: j.title,
+        company: j.company,
+        status: j.status,
+        matchScore:
+          typeof j.ai_match_score === "number" ? j.ai_match_score : null,
+      })),
     });
     const intentConfidence = assessPlanConfidence(message, plan);
     const suggested = suggestActions(message, plan);

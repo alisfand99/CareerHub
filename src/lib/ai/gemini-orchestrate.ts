@@ -22,6 +22,20 @@ export async function generateOrchestratorPlan(
   context: {
     skillNames: string[];
     jobsSummary: { title: string; company: string }[];
+    profileSnapshot?: {
+      displayName?: string | null;
+      headline?: string | null;
+      summary?: string | null;
+    } | null;
+    skillsSnapshot?: { name: string; proficiency?: number | null }[];
+    experienceSnapshot?: { title: string; organization?: string | null }[];
+    projectSnapshot?: { name: string; summary?: string | null }[];
+    jobsSnapshot?: {
+      title: string;
+      company: string;
+      status?: string | null;
+      matchScore?: number | null;
+    }[];
   },
 ): Promise<OrchestratorPlan> {
   const key = getGeminiApiKey();

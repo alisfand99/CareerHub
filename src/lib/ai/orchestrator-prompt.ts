@@ -1,6 +1,20 @@
 export function buildOrchestratorSystemPrompt(context: {
   skillNames: string[];
   jobsSummary: { title: string; company: string }[];
+  profileSnapshot?: {
+    displayName?: string | null;
+    headline?: string | null;
+    summary?: string | null;
+  } | null;
+  skillsSnapshot?: { name: string; proficiency?: number | null }[];
+  experienceSnapshot?: { title: string; organization?: string | null }[];
+  projectSnapshot?: { name: string; summary?: string | null }[];
+  jobsSnapshot?: {
+    title: string;
+    company: string;
+    status?: string | null;
+    matchScore?: number | null;
+  }[];
 }): string {
   const skills =
     context.skillNames.length > 0
@@ -12,6 +26,46 @@ export function buildOrchestratorSystemPrompt(context: {
           .map((j) => `${j.title} @ ${j.company}`)
           .join("; ")
       : "(no saved roles yet)";
+  const profile =
+    context.profileSnapshot &&
+    (context.profileSnapshot.displayName ||
+      context.profileSnapshot.headline ||
+      context.profileSnapshot.summary)
+      ? JSON.stringify(context.profileSnapshot)
+      : "(no profile snapshot yet)";
+  const skillsTop =
+    context.skillsSnapshot && context.skillsSnapshot.length > 0
+      ? context.skillsSnapshot
+          .slice(0, 20)
+          .map((s) => `${s.name}${s.proficiency ? `(${s.proficiency}/5)` : ""}`)
+          .join(", ")
+      : "(no detailed skills yet)";
+  const experiencesTop =
+    context.experienceSnapshot && context.experienceSnapshot.length > 0
+      ? context.experienceSnapshot
+          .slice(0, 12)
+          .map((e) => `${e.title}${e.organization ? ` @ ${e.organization}` : ""}`)
+          .join("; ")
+      : "(no experience entries yet)";
+  const projectsTop =
+    context.projectSnapshot && context.projectSnapshot.length > 0
+      ? context.projectSnapshot
+          .slice(0, 12)
+          .map((p) => p.name)
+          .join("; ")
+      : "(no projects yet)";
+  const jobsRich =
+    context.jobsSnapshot && context.jobsSnapshot.length > 0
+      ? context.jobsSnapshot
+          .slice(0, 15)
+          .map(
+            (j) =>
+              `${j.title} @ ${j.company}${j.status ? ` [${j.status}]` : ""}${
+                j.matchScore != null ? ` match:${Math.round(j.matchScore)}` : ""
+              }`,
+          )
+          .join("; ")
+      : "(no detailed job snapshot)";
 
   return `You are the Career-Hub AI assistant — a senior technical talent agent: strategic, concise, proactive, no fluff.
 
@@ -42,6 +96,16 @@ Intent rules:
 
 Context — user's current vault skill NAMES: ${skills}
 Context — user's saved jobs (title @ company): ${jobs}
+Context — user profile snapshot: ${profile}
+Context — top skills (with proficiency): ${skillsTop}
+Context — top experiences: ${experiencesTop}
+Context — top projects: ${projectsTop}
+Context — detailed jobs snapshot: ${jobsRich}
+
+General-answer rule:
+- If the user asks about themselves (strengths, fit, what to improve, career direction), answer directly using the context above.
+- Do NOT ask them to re-share resume/profile unless the relevant context is actually empty.
+- Be explicit about evidence: reference specific skills, projects, experiences, and saved jobs from context.
 
 For outreach_generation: use the closest matching job from context if the user references a company/role you recognize; still produce a strong draft even if ambiguous.
 
