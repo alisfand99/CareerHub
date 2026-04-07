@@ -180,6 +180,8 @@ export function SuperResumeEditor({
 
       <ProfileHeaderCard profile={p} userId={userId} userEmail={userEmail} run={run} />
 
+      <TailoredResumeBuilder jobs={jobs} />
+
       <SectionShell
         icon={Briefcase}
         title="Experience"
@@ -259,8 +261,6 @@ export function SuperResumeEditor({
           </ul>
         )}
       </SectionShell>
-
-      <TailoredResumeBuilder jobs={jobs} />
 
       <div className="grid gap-6 lg:grid-cols-2">
         <SectionShell
