@@ -18,6 +18,7 @@ import { useOrchestrator } from "@/components/orchestrator/orchestrator-context"
 import type { JobRow } from "@/lib/queries/jobs";
 
 const STATUSES = ["wishlist", "applied", "interview", "offer"] as const;
+type JobStatus = (typeof STATUSES)[number];
 
 const labels: Record<(typeof STATUSES)[number], string> = {
   wishlist: "Wishlist",
@@ -142,10 +143,16 @@ function JobKanbanCard({
   job,
   deleting,
   onRemove,
+  onDragStart,
+  onDragEnd,
+  isDragging,
 }: {
   job: JobRow;
   deleting: boolean;
   onRemove: () => void;
+  onDragStart: (jobId: string) => void;
+  onDragEnd: () => void;
+  isDragging: boolean;
 }) {
   const score =
     job.ai_match_score != null ? Number(job.ai_match_score) : null;
@@ -155,7 +162,19 @@ function JobKanbanCard({
   const companyLine = (job.company ?? "").trim() || "—";
 
   return (
-    <li className="group relative list-none">
+    <li
+      className={cn(
+        "group relative list-none",
+        isDragging && "opacity-45",
+      )}
+      draggable
+      onDragStart={(e) => {
+        e.dataTransfer.effectAllowed = "move";
+        e.dataTransfer.setData("text/plain", job.id);
+        onDragStart(job.id);
+      }}
+      onDragEnd={onDragEnd}
+    >
       <Link
         href={`/apply-hub/jobs/${job.id}`}
         className="block w-full max-w-full rounded-xl border border-slate-100 bg-white p-4 pr-10 shadow-sm outline-none ring-offset-white transition-all hover:border-slate-200 hover:shadow-md focus-visible:ring-2 focus-visible:ring-cyan-500"
@@ -238,10 +257,13 @@ export function ApplyHubBoard({ initialJobs }: { initialJobs: JobRow[] }) {
   const { busy } = useOrchestrator();
   const onApplyHub = pathname.startsWith("/apply-hub");
   const showPipelinePulse = busy && onApplyHub;
+  const [jobs, setJobs] = useState<JobRow[]>(initialJobs);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [draggedJobId, setDraggedJobId] = useState<string | null>(null);
+  const [dropStatus, setDropStatus] = useState<JobStatus | null>(null);
 
   const { avgPct, highBandCount, totalScored } = useMemo(() => {
-    const scored = initialJobs.filter((j) => j.ai_match_score != null);
+    const scored = jobs.filter((j) => j.ai_match_score != null);
     const nums = scored.map((j) => Number(j.ai_match_score));
     const avg =
       nums.length > 0
@@ -253,7 +275,7 @@ export function ApplyHubBoard({ initialJobs }: { initialJobs: JobRow[] }) {
       highBandCount: high,
       totalScored: scored.length,
     };
-  }, [initialJobs]);
+  }, [jobs]);
 
   async function removeJob(jobId: string, title: string) {
     if (
@@ -270,15 +292,39 @@ export function ApplyHubBoard({ initialJobs }: { initialJobs: JobRow[] }) {
         window.alert(error.message);
         return;
       }
-      router.refresh();
+      setJobs((prev) => prev.filter((j) => j.id !== jobId));
     } finally {
       setDeletingId(null);
     }
   }
 
+  async function moveJobToStatus(jobId: string, targetStatus: JobStatus) {
+    const source = jobs.find((j) => j.id === jobId);
+    if (!source || source.status === targetStatus) return;
+
+    const previousJobs = jobs;
+    const optimistic = previousJobs.map((j) =>
+      j.id === jobId ? { ...j, status: targetStatus } : j,
+    );
+    setJobs(optimistic);
+
+    const supabase = createClient();
+    const { error } = await supabase
+      .from("jobs")
+      .update({ status: targetStatus })
+      .eq("id", jobId);
+
+    if (error) {
+      setJobs(previousJobs);
+      window.alert(error.message);
+      return;
+    }
+    router.refresh();
+  }
+
   const byStatus = STATUSES.map((s) => ({
     status: s,
-    jobs: initialJobs.filter((j) => j.status === s),
+    jobs: jobs.filter((j) => j.status === s),
   }));
 
   const gridBoardStyle = {
@@ -345,9 +391,33 @@ export function ApplyHubBoard({ initialJobs }: { initialJobs: JobRow[] }) {
                         "flex w-[min(90vw,320px)] shrink-0 flex-col rounded-xl border border-slate-100 bg-white/95 p-3 shadow-sm",
                         "min-h-[260px] sm:min-h-[280px]",
                         "lg:w-auto lg:min-w-0 lg:max-w-none",
+                        dropStatus === status &&
+                          "border-cyan-300 bg-cyan-50/40 ring-2 ring-cyan-200/70 ring-offset-1 ring-offset-white",
                         showPipelinePulse &&
                           "ring-2 ring-cyan-200/90 ring-offset-1 ring-offset-white",
                       )}
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        if (dropStatus !== status) setDropStatus(status);
+                      }}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        const droppedId =
+                          e.dataTransfer.getData("text/plain") || draggedJobId;
+                        setDropStatus(null);
+                        setDraggedJobId(null);
+                        if (droppedId) {
+                          void moveJobToStatus(droppedId, status);
+                        }
+                      }}
+                      onDragLeave={(e) => {
+                        const next = e.relatedTarget as Node | null;
+                        if (!next || !e.currentTarget.contains(next)) {
+                          setDropStatus((current) =>
+                            current === status ? null : current,
+                          );
+                        }
+                      }}
                     >
                       <div className="mb-3 flex items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
                         <h3 className="min-w-0 text-[0.8125rem] font-semibold text-slate-900">
@@ -369,6 +439,12 @@ export function ApplyHubBoard({ initialJobs }: { initialJobs: JobRow[] }) {
                             job={job}
                             deleting={deletingId === job.id}
                             onRemove={() => void removeJob(job.id, job.title)}
+                            onDragStart={setDraggedJobId}
+                            onDragEnd={() => {
+                              setDraggedJobId(null);
+                              setDropStatus(null);
+                            }}
+                            isDragging={draggedJobId === job.id}
                           />
                         ))}
                         {jobs.length === 0 ? (
@@ -395,7 +471,7 @@ export function ApplyHubBoard({ initialJobs }: { initialJobs: JobRow[] }) {
               avgPct={avgPct}
               highBandCount={highBandCount}
               totalScored={totalScored}
-              totalJobs={initialJobs.length}
+              totalJobs={jobs.length}
             />
           </aside>
         </div>
