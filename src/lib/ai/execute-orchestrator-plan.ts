@@ -26,6 +26,10 @@ function parseIsoDate(s: string | undefined): string | null {
   return /^\d{4}-\d{2}-\d{2}$/.test(t) ? t : null;
 }
 
+function norm(v: string | null | undefined): string {
+  return (v ?? "").trim().toLowerCase().replace(/\s+/g, " ");
+}
+
 const ORCHESTRATOR_ERR_UI_MAX = 1400;
 
 function truncateForUi(s: string, max: number): string {
@@ -243,6 +247,10 @@ export async function executeOrchestratorPlan(
   let assistantMessage = plan.assistant_message;
   const conflicts: { section: string; note: string }[] = [];
   let dedupedExperiences = 0;
+  let dedupedEducation = 0;
+  let dedupedCertifications = 0;
+  let dedupedLanguages = 0;
+  let dedupedProjects = 0;
 
   await logBioVault(supabase, userId, "user", userMessage, {
     source: "orchestrator",
@@ -521,18 +529,45 @@ export async function executeOrchestratorPlan(
         }
 
         if (plan.education?.length) {
+          const { data: existingEducation } = await supabase
+            .from("education_entries")
+            .select("school, degree, field_of_study, start_date, end_date, is_current")
+            .eq("user_id", userId);
           let eduInserted = 0;
           for (const ed of plan.education) {
             const school = ed.school?.trim();
             if (!school) continue;
             const cur = Boolean(ed.is_current);
+            const startDate = parseIsoDate(ed.start_date);
+            const endDate = cur ? null : parseIsoDate(ed.end_date);
+            const duplicate = existingEducation?.some((row) => {
+              const sameSchool = norm(row.school) === norm(school);
+              const sameDegree = norm(row.degree) === norm(ed.degree ?? null);
+              const sameField =
+                norm(row.field_of_study) === norm(ed.field_of_study ?? null);
+              const sameStart = (row.start_date ?? null) === startDate;
+              const sameEnd = (row.end_date ?? null) === endDate;
+              const sameCurrent = Boolean(row.is_current) === cur;
+              return (
+                sameSchool &&
+                sameDegree &&
+                sameField &&
+                sameStart &&
+                sameEnd &&
+                sameCurrent
+              );
+            });
+            if (duplicate) {
+              dedupedEducation += 1;
+              continue;
+            }
             const { error: edErr } = await supabase.from("education_entries").insert({
               user_id: userId,
               school,
               degree: ed.degree?.trim() || null,
               field_of_study: ed.field_of_study?.trim() || null,
-              start_date: parseIsoDate(ed.start_date),
-              end_date: cur ? null : parseIsoDate(ed.end_date),
+              start_date: startDate,
+              end_date: endDate,
               is_current: cur,
               description: ed.description?.trim() || null,
             });
@@ -543,18 +578,35 @@ export async function executeOrchestratorPlan(
         }
 
         if (plan.certifications?.length) {
+          const { data: existingCerts } = await supabase
+            .from("certification_entries")
+            .select("name, issuing_org, issue_date, expiration_date")
+            .eq("user_id", userId);
           let certInserted = 0;
           for (const c of plan.certifications) {
             const name = c.name?.trim();
             if (!name) continue;
+            const issueDate = parseIsoDate(c.issue_date);
+            const expirationDate = parseIsoDate(c.expiration_date);
+            const duplicate = existingCerts?.some((row) => {
+              const sameName = norm(row.name) === norm(name);
+              const sameOrg = norm(row.issuing_org) === norm(c.issuing_org ?? null);
+              const sameIssue = (row.issue_date ?? null) === issueDate;
+              const sameExp = (row.expiration_date ?? null) === expirationDate;
+              return sameName && sameOrg && sameIssue && sameExp;
+            });
+            if (duplicate) {
+              dedupedCertifications += 1;
+              continue;
+            }
             const { error: cErr } = await supabase
               .from("certification_entries")
               .insert({
                 user_id: userId,
                 name,
                 issuing_org: c.issuing_org?.trim() || null,
-                issue_date: parseIsoDate(c.issue_date),
-                expiration_date: parseIsoDate(c.expiration_date),
+                issue_date: issueDate,
+                expiration_date: expirationDate,
                 credential_url: c.credential_url?.trim() || null,
               });
             if (cErr) throw cErr;
@@ -564,10 +616,24 @@ export async function executeOrchestratorPlan(
         }
 
         if (plan.languages?.length) {
+          const { data: existingLangs } = await supabase
+            .from("language_entries")
+            .select("name, proficiency")
+            .eq("user_id", userId);
           let langInserted = 0;
           for (const lang of plan.languages) {
             const name = lang.name?.trim();
             if (!name) continue;
+            const duplicate = existingLangs?.some((row) => {
+              const sameName = norm(row.name) === norm(name);
+              const sameProf =
+                norm(row.proficiency) === norm(lang.proficiency ?? null);
+              return sameName && sameProf;
+            });
+            if (duplicate) {
+              dedupedLanguages += 1;
+              continue;
+            }
             const { error: lErr } = await supabase.from("language_entries").insert({
               user_id: userId,
               name,
@@ -580,10 +646,24 @@ export async function executeOrchestratorPlan(
         }
 
         if (plan.projects?.length) {
+          const { data: existingProjects } = await supabase
+            .from("projects")
+            .select("name, summary")
+            .eq("user_id", userId);
           let projInserted = 0;
           for (const pr of plan.projects) {
             const name = pr.name?.trim();
             if (!name) continue;
+            const duplicate = existingProjects?.some((row) => {
+              const sameName = norm(row.name) === norm(name);
+              const sameSummary =
+                norm(row.summary) === norm(pr.summary ?? null);
+              return sameName && sameSummary;
+            });
+            if (duplicate) {
+              dedupedProjects += 1;
+              continue;
+            }
             const { error: prErr } = await supabase.from("projects").insert({
               user_id: userId,
               name,
@@ -697,6 +777,38 @@ export async function executeOrchestratorPlan(
         note: `Skipped ${dedupedExperiences} experience block${
           dedupedExperiences > 1 ? "s" : ""
         } that looked identical to existing entries.`,
+      });
+    }
+    if (dedupedProjects > 0) {
+      conflicts.push({
+        section: "projects",
+        note: `Skipped ${dedupedProjects} project entr${
+          dedupedProjects > 1 ? "ies" : "y"
+        } that looked duplicated.`,
+      });
+    }
+    if (dedupedEducation > 0) {
+      conflicts.push({
+        section: "education",
+        note: `Skipped ${dedupedEducation} education entr${
+          dedupedEducation > 1 ? "ies" : "y"
+        } that looked duplicated.`,
+      });
+    }
+    if (dedupedCertifications > 0) {
+      conflicts.push({
+        section: "certifications",
+        note: `Skipped ${dedupedCertifications} certification entr${
+          dedupedCertifications > 1 ? "ies" : "y"
+        } that looked duplicated.`,
+      });
+    }
+    if (dedupedLanguages > 0) {
+      conflicts.push({
+        section: "languages",
+        note: `Skipped ${dedupedLanguages} language entr${
+          dedupedLanguages > 1 ? "ies" : "y"
+        } that looked duplicated.`,
       });
     }
 

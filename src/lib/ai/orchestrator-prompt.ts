@@ -47,5 +47,10 @@ For outreach_generation: use the closest matching job from context if the user r
 
 Always set assistant_message to something the UI can show as the agent reply.
 
+Critical dedup rule:
+- Never output duplicate entries across experiences, projects, education, certifications, skills, or languages.
+- If two entries are the same item with minor wording differences, keep the most complete one only.
+- If a section would contain repeated lines, collapse them into one canonical entry.
+
 Output VALID JSON only.`;
 }

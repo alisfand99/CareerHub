@@ -75,6 +75,22 @@ function dateInputValue(iso: string | null | undefined): string {
   return /^\d{4}-\d{2}-\d{2}$/.test(d) ? d : "";
 }
 
+function normText(v: string | null | undefined): string {
+  return (v ?? "").trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+function dedupeByKey<T>(items: T[], getKey: (item: T) => string): T[] {
+  const seen = new Set<string>();
+  const out: T[] = [];
+  for (const item of items) {
+    const key = getKey(item);
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    out.push(item);
+  }
+  return out;
+}
+
 function SectionShell({
   icon: Icon,
   title,
@@ -144,6 +160,34 @@ export function SuperResumeEditor({
   }
 
   const p = bundle.profile;
+  const experiences = dedupeByKey(
+    bundle.experiences,
+    (e) => `${normText(e.title)}|${normText(e.organization)}|${dateInputValue(e.start_date)}|${dateInputValue(e.end_date)}`,
+  );
+  const skills = dedupeByKey(
+    bundle.skills,
+    (s) => `${normText(s.name)}|${normText(s.category)}`,
+  );
+  const projects = dedupeByKey(
+    bundle.projects,
+    (pr) => `${normText(pr.name)}|${normText(pr.summary)}`,
+  );
+  const education = dedupeByKey(
+    bundle.education,
+    (ed) => `${normText(ed.school)}|${normText(ed.degree)}|${normText(ed.field_of_study)}|${dateInputValue(ed.start_date)}|${dateInputValue(ed.end_date)}`,
+  );
+  const certifications = dedupeByKey(
+    bundle.certifications,
+    (c) => `${normText(c.name)}|${normText(c.issuing_org)}|${dateInputValue(c.issue_date)}`,
+  );
+  const languages = dedupeByKey(
+    bundle.languages,
+    (l) => `${normText(l.name)}|${normText(l.proficiency)}`,
+  );
+  const dedupedMarketGaps = dedupeByKey(
+    marketGaps,
+    (g) => `${normText(g.skill)}|${normText(g.jobFamily)}|${normText(g.sourceJob)}`,
+  );
 
   return (
     <div className="mx-auto max-w-4xl space-y-8 pb-12">
@@ -194,11 +238,11 @@ export function SuperResumeEditor({
           />
         }
       >
-        {bundle.experiences.length === 0 ? (
+        {experiences.length === 0 ? (
           <EmptyHint text="No roles yet. Add one or paste a résumé into the Assistant." />
         ) : (
           <ul className="space-y-3">
-            {bundle.experiences.map((e) => (
+            {experiences.map((e) => (
               <li
                 key={e.id}
                 className="rounded-lg border border-border/70 bg-card/50 px-3 py-3"
@@ -275,22 +319,23 @@ export function SuperResumeEditor({
             />
           }
         >
-          {bundle.skills.length === 0 ? (
+          {skills.length === 0 ? (
             <EmptyHint text="Add skills manually or describe them to the Assistant." />
           ) : (
-            <ul className="flex flex-wrap gap-2">
-              {bundle.skills.map((s) => (
+            <ul className="grid gap-2 sm:grid-cols-2">
+              {skills.map((s) => (
                 <li
                   key={s.id}
-                  className="flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 pl-2.5 pr-1 py-0.5 text-sm"
+                  className="flex items-center justify-between gap-1 rounded-lg border border-border/70 bg-muted/40 px-2.5 py-1 text-sm"
                 >
-                  <span>{s.name}</span>
-                  {s.proficiency != null ? (
-                    <span className="text-xs text-muted-foreground">
+                  <span className="truncate">{s.name}</span>
+                  <span className="flex items-center gap-1">
+                    {s.proficiency != null ? (
+                      <span className="text-xs text-muted-foreground">
                       · {s.proficiency}/5
-                    </span>
-                  ) : null}
-                  <SkillDialog
+                      </span>
+                    ) : null}
+                    <SkillDialog
                     userId={userId}
                     initial={s}
                     onDone={run}
@@ -305,7 +350,7 @@ export function SuperResumeEditor({
                       </Button>
                     }
                   />
-                  <Button
+                    <Button
                     type="button"
                     variant="ghost"
                     size="icon-xs"
@@ -323,7 +368,8 @@ export function SuperResumeEditor({
                     }}
                   >
                     <Trash2 className="size-3" aria-hidden />
-                  </Button>
+                    </Button>
+                  </span>
                 </li>
               ))}
             </ul>
@@ -342,11 +388,11 @@ export function SuperResumeEditor({
             />
           }
         >
-          {bundle.projects.length === 0 ? (
+          {projects.length === 0 ? (
             <EmptyHint text="Add a project or mention one to the Assistant." />
           ) : (
-            <ul className="space-y-2">
-              {bundle.projects.map((pr) => (
+            <ul className="grid gap-2 sm:grid-cols-2">
+              {projects.map((pr) => (
                 <li
                   key={pr.id}
                   className="flex items-start justify-between gap-2 rounded-lg border border-border/70 px-2 py-2"
@@ -409,11 +455,11 @@ export function SuperResumeEditor({
           />
         }
       >
-        {bundle.education.length === 0 ? (
+        {education.length === 0 ? (
           <EmptyHint text="Add schools you’ve attended." />
         ) : (
           <ul className="space-y-2">
-            {bundle.education.map((ed) => (
+            {education.map((ed) => (
               <EducationRowActions key={ed.id} ed={ed} userId={userId} run={run} />
             ))}
           </ul>
@@ -433,11 +479,11 @@ export function SuperResumeEditor({
             />
           }
         >
-          {bundle.certifications.length === 0 ? (
+          {certifications.length === 0 ? (
             <EmptyHint text="No certificates yet." />
           ) : (
-            <ul className="space-y-2">
-              {bundle.certifications.map((c) => (
+            <ul className="grid gap-2 sm:grid-cols-2">
+              {certifications.map((c) => (
                 <CertRowActions key={c.id} c={c} userId={userId} run={run} />
               ))}
             </ul>
@@ -456,11 +502,11 @@ export function SuperResumeEditor({
             />
           }
         >
-          {bundle.languages.length === 0 ? (
+          {languages.length === 0 ? (
             <EmptyHint text="Add languages you speak or write." />
           ) : (
             <ul className="space-y-2">
-              {bundle.languages.map((l) => (
+              {languages.map((l) => (
                 <LangRowActions key={l.id} l={l} userId={userId} run={run} />
               ))}
             </ul>
@@ -477,14 +523,14 @@ export function SuperResumeEditor({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {marketGaps.length === 0 ? (
+          {dedupedMarketGaps.length === 0 ? (
             <p className="text-sm text-muted-foreground">
               Save a job in Apply Hub (or paste a posting to the Assistant) to
               see market signals here.
             </p>
           ) : (
-            <ul className="space-y-2">
-              {marketGaps.map((g, i) => (
+            <ul className="grid max-h-80 gap-2 overflow-auto pr-1 sm:grid-cols-2">
+              {dedupedMarketGaps.map((g, i) => (
                 <li
                   key={`${g.skill}-${i}`}
                   className="rounded-lg border border-primary/15 bg-background/80 px-3 py-2"
@@ -516,7 +562,7 @@ export function SuperResumeEditor({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <pre className="max-h-72 overflow-auto whitespace-pre-wrap rounded-md border border-border/70 bg-muted/30 p-4 text-xs leading-relaxed">
+            <pre className="max-h-56 overflow-auto whitespace-pre-wrap rounded-md border border-border/70 bg-muted/30 p-4 text-xs leading-relaxed">
               {assistantResumeDraft}
             </pre>
           </CardContent>
