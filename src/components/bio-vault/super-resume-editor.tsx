@@ -49,6 +49,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useOrchestrator } from "@/components/orchestrator/orchestrator-context";
 
+type BioVaultJobOption = {
+  id: string;
+  title: string;
+  company: string;
+  status: string;
+  jdText: string | null;
+};
+
 function bulletsToText(b: unknown): string {
   if (!Array.isArray(b)) return "";
   return b.filter((x): x is string => typeof x === "string").join("\n");
@@ -102,6 +110,7 @@ export function SuperResumeEditor({
   userEmail,
   bundle,
   marketGaps,
+  jobs,
   assistantResumeDraft,
   dataLoadWarning,
 }: {
@@ -109,6 +118,7 @@ export function SuperResumeEditor({
   userEmail: string;
   bundle: SuperResumeBundle;
   marketGaps: MarketGapRow[];
+  jobs: BioVaultJobOption[];
   assistantResumeDraft: string | null;
   /** Shown when some Supabase sections failed (e.g. schema not migrated). */
   dataLoadWarning?: string | null;
@@ -249,6 +259,8 @@ export function SuperResumeEditor({
           </ul>
         )}
       </SectionShell>
+
+      <TailoredResumeBuilder jobs={jobs} />
 
       <div className="grid gap-6 lg:grid-cols-2">
         <SectionShell
@@ -512,6 +524,119 @@ export function SuperResumeEditor({
       ) : null}
       </div>
     </div>
+  );
+}
+
+function TailoredResumeBuilder({ jobs }: { jobs: BioVaultJobOption[] }) {
+  const [selectedJobId, setSelectedJobId] = useState(jobs[0]?.id ?? "");
+  const [extraFocus, setExtraFocus] = useState("");
+  const [draft, setDraft] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+
+  const selectedJob = jobs.find((j) => j.id === selectedJobId) ?? null;
+
+  return (
+    <Card className="border-cyan-200/80 bg-cyan-50/40 shadow-md">
+      <CardHeader>
+        <CardTitle className="text-base">Targeted resume builder</CardTitle>
+        <CardDescription>
+          Choose a job card and generate a tailored resume draft from your
+          Bio-Vault skills and experience.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {jobs.length === 0 ? (
+          <p className="text-sm text-muted-foreground">
+            Add at least one job in Apply Hub to generate a targeted resume.
+          </p>
+        ) : (
+          <>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Field label="Target job card" id="target-job">
+                <select
+                  id="target-job"
+                  className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                  value={selectedJobId}
+                  onChange={(e) => setSelectedJobId(e.target.value)}
+                >
+                  {jobs.map((job) => (
+                    <option key={job.id} value={job.id}>
+                      {job.title} — {job.company} ({job.status})
+                    </option>
+                  ))}
+                </select>
+              </Field>
+              <Field label="Extra focus (optional)" id="extra-focus">
+                <Input
+                  id="extra-focus"
+                  value={extraFocus}
+                  onChange={(e) => setExtraFocus(e.target.value)}
+                  placeholder="e.g. Emphasize leadership + B2B SaaS impact"
+                />
+              </Field>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3">
+              <Button
+                type="button"
+                disabled={busy || !selectedJobId}
+                onClick={async () => {
+                  if (!selectedJobId) return;
+                  setBusy(true);
+                  setErr(null);
+                  try {
+                    const res = await fetch("/api/bio-vault/generate-resume", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        jobId: selectedJobId,
+                        extraFocus: extraFocus.trim() || null,
+                      }),
+                    });
+                    const json = (await res.json()) as {
+                      error?: string;
+                      resumeMarkdown?: string;
+                    };
+                    if (!res.ok || !json.resumeMarkdown) {
+                      throw new Error(json.error || "Failed to generate resume");
+                    }
+                    setDraft(json.resumeMarkdown);
+                  } catch (e) {
+                    setErr(e instanceof Error ? e.message : "Generation failed");
+                  } finally {
+                    setBusy(false);
+                  }
+                }}
+              >
+                {busy ? (
+                  <>
+                    <Loader2 className="size-4 animate-spin" aria-hidden />
+                    Generating tailored resume…
+                  </>
+                ) : (
+                  "Generate for selected job"
+                )}
+              </Button>
+              {selectedJob ? (
+                <p className="text-xs text-muted-foreground">
+                  Target: <span className="font-medium">{selectedJob.title}</span>{" "}
+                  at {selectedJob.company}
+                </p>
+              ) : null}
+            </div>
+
+            {err ? <p className="text-xs text-destructive">{err}</p> : null}
+
+            {draft ? (
+              <pre className="max-h-96 overflow-auto whitespace-pre-wrap rounded-md border border-border/70 bg-background p-4 text-xs leading-relaxed">
+                {draft}
+              </pre>
+            ) : null}
+          </>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 

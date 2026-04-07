@@ -44,7 +44,7 @@ export default async function BioVaultPage() {
 
   const { data: jobRows } = await supabase
     .from("jobs")
-    .select("title, company, ai_insights")
+    .select("id, title, company, status, jd_text, ai_insights")
     .eq("user_id", user.id)
     .order("updated_at", { ascending: false });
 
@@ -78,6 +78,15 @@ export default async function BioVaultPage() {
       userEmail={user.email ?? ""}
       bundle={bundle}
       marketGaps={marketGaps}
+      jobs={
+        (jobRows ?? []).map((j) => ({
+          id: j.id,
+          title: j.title,
+          company: j.company,
+          status: j.status,
+          jdText: typeof j.jd_text === "string" ? j.jd_text : null,
+        }))
+      }
       assistantResumeDraft={assistantResumeDraft}
       dataLoadWarning={hadLoadFailures ? bioVaultPartialLoad : null}
     />

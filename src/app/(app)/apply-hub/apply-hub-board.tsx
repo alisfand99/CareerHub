@@ -345,8 +345,8 @@ export function ApplyHubBoard({ initialJobs }: { initialJobs: JobRow[] }) {
           Pipeline · posting insights
         </p>
         <p className="max-w-3xl text-sm leading-relaxed text-slate-700 md:text-[0.95rem]">
-          Four pipeline stages, mock-style cards (single-line titles with
-          ellipsis), and match overview on the right.
+          کارت‌ها را بین ستون‌ها بکشید و رها کنید تا وضعیت فرصت‌ها سریع
+          به‌روزرسانی شود. روی هر کارت کلیک کنید تا جزئیات کامل آن را ببینید.
         </p>
       </header>
 
