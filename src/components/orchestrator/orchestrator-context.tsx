@@ -35,6 +35,22 @@ type OrchestrateResponse = {
   delta?: OrchestratorDelta;
 };
 
+function toSafeAssistantError(input?: string): string {
+  const msg = (input ?? "").trim();
+  if (!msg) return "We hit an internal issue. Please try again.";
+  const lower = msg.toLowerCase();
+  if (lower.includes("unauthorized")) {
+    return "Your session expired. Please sign in again.";
+  }
+  if (lower.includes("career assistant isn")) {
+    return msg;
+  }
+  if (lower.includes("network")) {
+    return "Network issue while contacting the assistant. Please retry.";
+  }
+  return "Something went wrong while processing your request. Please try again.";
+}
+
 type OrchestratorContextValue = {
   open: boolean;
   setOpen: (v: boolean) => void;
@@ -128,7 +144,7 @@ export function OrchestratorProvider({ children }: { children: ReactNode }) {
             {
               id: crypto.randomUUID(),
               role: "assistant",
-              content: data.error ?? "Request failed.",
+              content: toSafeAssistantError(data.error),
             },
           ]);
           clearFlowLater(null);

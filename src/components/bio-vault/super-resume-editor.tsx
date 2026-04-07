@@ -91,6 +91,22 @@ function dedupeByKey<T>(items: T[], getKey: (item: T) => string): T[] {
   return out;
 }
 
+function formatUiError(err: unknown): string {
+  if (err instanceof Error) {
+    const m = err.message.toLowerCase();
+    if (m.includes("network") || m.includes("fetch")) {
+      return "Network connection issue. Please try again.";
+    }
+    if (m.includes("permission") || m.includes("unauthorized")) {
+      return "You do not have permission for this action.";
+    }
+    if (m.includes("duplicate key")) {
+      return "This item already exists in your vault.";
+    }
+  }
+  return "Something went wrong while saving your Bio-Vault changes. Please try again.";
+}
+
 function SectionShell({
   icon: Icon,
   title,
@@ -142,6 +158,7 @@ export function SuperResumeEditor({
   const router = useRouter();
   const { triggerManualPulse } = useOrchestrator();
   const [busy, setBusy] = useState(false);
+  const [uiError, setUiError] = useState<string | null>(null);
 
   async function refresh() {
     triggerManualPulse("bio");
@@ -150,10 +167,14 @@ export function SuperResumeEditor({
 
   async function run<T>(fn: () => Promise<T>): Promise<T | undefined> {
     setBusy(true);
+    setUiError(null);
     try {
       const r = await fn();
       await refresh();
       return r;
+    } catch (err) {
+      setUiError(formatUiError(err));
+      return undefined;
     } finally {
       setBusy(false);
     }
@@ -221,6 +242,14 @@ export function SuperResumeEditor({
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Loader2 className="size-4 animate-spin" aria-hidden />
           Saving…
+        </div>
+      ) : null}
+      {uiError ? (
+        <div
+          role="alert"
+          className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900"
+        >
+          {uiError}
         </div>
       ) : null}
 
@@ -653,7 +682,12 @@ function TailoredResumeBuilder({ jobs }: { jobs: BioVaultJobOption[] }) {
                     }
                     setDraft(json.resumeMarkdown);
                   } catch (e) {
-                    setErr(e instanceof Error ? e.message : "Generation failed");
+                    const msg =
+                      e instanceof Error &&
+                      e.message.toLowerCase().includes("career assistant isn’t enabled")
+                        ? e.message
+                        : "Couldn’t generate the tailored resume right now. Please try again.";
+                    setErr(msg);
                   } finally {
                     setBusy(false);
                   }
