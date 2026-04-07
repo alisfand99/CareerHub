@@ -292,6 +292,41 @@ create trigger language_entries_set_updated_at
   for each row execute procedure public.set_updated_at();
 
 -- -----------------------------------------------------------------------------
+-- Hidden admin ops: connection logs
+-- -----------------------------------------------------------------------------
+create table if not exists public.admin_users (
+  user_id uuid primary key references auth.users (id) on delete cascade,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.connection_logs (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  user_email text,
+  session_key text not null,
+  ip_address text,
+  user_agent text,
+  device_type text,
+  os_name text,
+  browser_name text,
+  first_seen_at timestamptz not null default now(),
+  last_seen_at timestamptz not null default now(),
+  hit_count integer not null default 1,
+  last_path text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (user_id, session_key)
+);
+
+create index if not exists connection_logs_user_id_idx on public.connection_logs (user_id);
+create index if not exists connection_logs_last_seen_idx on public.connection_logs (last_seen_at desc);
+
+drop trigger if exists connection_logs_set_updated_at on public.connection_logs;
+create trigger connection_logs_set_updated_at
+  before update on public.connection_logs
+  for each row execute procedure public.set_updated_at();
+
+-- -----------------------------------------------------------------------------
 -- Row Level Security
 -- -----------------------------------------------------------------------------
 alter table public.profiles enable row level security;
@@ -306,6 +341,8 @@ alter table public.contact_job_referrals enable row level security;
 alter table public.education_entries enable row level security;
 alter table public.certification_entries enable row level security;
 alter table public.language_entries enable row level security;
+alter table public.admin_users enable row level security;
+alter table public.connection_logs enable row level security;
 
 -- Idempotent policy refresh (re-run safe)
 do $$
@@ -319,7 +356,8 @@ begin
       and tablename in (
         'profiles', 'jobs', 'master_skills', 'experience_blocks', 'projects',
         'project_skills', 'bio_vault_messages', 'contacts', 'contact_job_referrals',
-        'education_entries', 'certification_entries', 'language_entries'
+        'education_entries', 'certification_entries', 'language_entries',
+        'admin_users', 'connection_logs'
       )
   loop
     execute format(
@@ -402,3 +440,21 @@ create policy "lang_select_own" on public.language_entries for select using (aut
 create policy "lang_insert_own" on public.language_entries for insert with check (auth.uid() = user_id);
 create policy "lang_update_own" on public.language_entries for update using (auth.uid() = user_id);
 create policy "lang_delete_own" on public.language_entries for delete using (auth.uid() = user_id);
+
+-- Admin users list (self-readable)
+create policy "admin_users_select_self" on public.admin_users for select using (auth.uid() = user_id);
+
+-- Connection logs:
+-- - users can write/read their own sessions
+-- - admins can read all rows
+create policy "connection_logs_select_own" on public.connection_logs for select using (auth.uid() = user_id);
+create policy "connection_logs_insert_own" on public.connection_logs for insert with check (auth.uid() = user_id);
+create policy "connection_logs_update_own" on public.connection_logs for update using (auth.uid() = user_id);
+
+create policy "connection_logs_select_admin" on public.connection_logs for select using (
+  exists (
+    select 1
+    from public.admin_users au
+    where au.user_id = auth.uid()
+  )
+);

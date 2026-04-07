@@ -48,6 +48,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useOrchestrator } from "@/components/orchestrator/orchestrator-context";
+import { cn } from "@/lib/utils";
 
 type BioVaultJobOption = {
   id: string;
@@ -301,25 +302,33 @@ export function SuperResumeEditor({
                         </Button>
                       }
                     />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon-xs"
-                      className="text-destructive hover:text-destructive"
-                      onClick={() => {
-                        if (!confirm("Remove this experience?")) return;
+                    <ConfirmDeleteButton
+                      title="Remove experience"
+                      description="This will remove matching duplicate entries too."
+                      className="hover:text-destructive"
+                      onConfirm={() => {
                         void run(async () => {
                           const sb = createClient();
-                          const { error } = await sb
+                          let q = sb
                             .from("experience_blocks")
                             .delete()
-                            .eq("id", e.id);
+                            .eq("user_id", userId)
+                            .eq("title", e.title)
+                            .eq("is_current", e.is_current);
+                          q = e.organization
+                            ? q.eq("organization", e.organization)
+                            : q.is("organization", null);
+                          q = e.start_date
+                            ? q.eq("start_date", e.start_date)
+                            : q.is("start_date", null);
+                          q = e.end_date
+                            ? q.eq("end_date", e.end_date)
+                            : q.is("end_date", null);
+                          const { error } = await q;
                           if (error) throw error;
                         });
                       }}
-                    >
-                      <Trash2 className="size-4" aria-hidden />
-                    </Button>
+                    />
                   </div>
                 </div>
                 {bulletsToText(e.bullets) ? (
@@ -379,25 +388,27 @@ export function SuperResumeEditor({
                       </Button>
                     }
                   />
-                    <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon-xs"
-                    className="size-6 text-destructive"
-                    onClick={() => {
-                      if (!confirm(`Remove “${s.name}”?`)) return;
-                      void run(async () => {
-                        const sb = createClient();
-                        const { error } = await sb
-                          .from("master_skills")
-                          .delete()
-                          .eq("id", s.id);
-                        if (error) throw error;
-                      });
-                    }}
-                  >
-                    <Trash2 className="size-3" aria-hidden />
-                    </Button>
+                    <ConfirmDeleteButton
+                      title={`Remove “${s.name}”?`}
+                      description="This will remove matching duplicate skill entries."
+                      className="size-6"
+                      iconClassName="size-3"
+                      onConfirm={() => {
+                        void run(async () => {
+                          const sb = createClient();
+                          let q = sb
+                            .from("master_skills")
+                            .delete()
+                            .eq("user_id", userId)
+                            .eq("name", s.name);
+                          q = s.category
+                            ? q.eq("category", s.category)
+                            : q.is("category", null);
+                          const { error } = await q;
+                          if (error) throw error;
+                        });
+                      }}
+                    />
                   </span>
                 </li>
               ))}
@@ -445,25 +456,25 @@ export function SuperResumeEditor({
                         </Button>
                       }
                     />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon-xs"
-                      className="text-destructive"
-                      onClick={() => {
-                        if (!confirm("Remove this project?")) return;
+                    <ConfirmDeleteButton
+                      title="Remove project"
+                      description="This will remove matching duplicate project entries."
+                      onConfirm={() => {
                         void run(async () => {
                           const sb = createClient();
-                          const { error } = await sb
+                          let q = sb
                             .from("projects")
                             .delete()
-                            .eq("id", pr.id);
+                            .eq("user_id", userId)
+                            .eq("name", pr.name);
+                          q = pr.summary
+                            ? q.eq("summary", pr.summary)
+                            : q.is("summary", null);
+                          const { error } = await q;
                           if (error) throw error;
                         });
                       }}
-                    >
-                      <Trash2 className="size-4" aria-hidden />
-                    </Button>
+                    />
                   </div>
                 </li>
               ))}
@@ -735,6 +746,59 @@ function AddTrigger({ label }: { label: string }) {
       <Plus className="size-3.5" aria-hidden />
       {label}
     </Button>
+  );
+}
+
+function ConfirmDeleteButton({
+  title,
+  description,
+  onConfirm,
+  className,
+  iconClassName,
+}: {
+  title: string;
+  description: string;
+  onConfirm: () => void;
+  className?: string;
+  iconClassName?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger
+        render={
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-xs"
+            className={cn("text-destructive", className)}
+          />
+        }
+      >
+        <Trash2 className={cn("size-4", iconClassName)} aria-hidden />
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-sm" showCloseButton>
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
+        </DialogHeader>
+        <div className="flex justify-end gap-2 pt-2">
+          <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+            Cancel
+          </Button>
+          <Button
+            type="button"
+            variant="destructive"
+            onClick={() => {
+              onConfirm();
+              setOpen(false);
+            }}
+          >
+            Delete
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -1512,22 +1576,31 @@ function EducationRowActions({
             </Button>
           }
         />
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon-xs"
-          className="text-destructive"
-          onClick={() => {
-            if (!confirm("Remove this entry?")) return;
+        <ConfirmDeleteButton
+          title="Remove education entry"
+          description="This will remove matching duplicate entries too."
+          onConfirm={() => {
             void run(async () => {
               const sb = createClient();
-              const { error } = await sb.from("education_entries").delete().eq("id", ed.id);
+              let q = sb
+                .from("education_entries")
+                .delete()
+                .eq("user_id", userId)
+                .eq("school", ed.school)
+                .eq("is_current", ed.is_current);
+              q = ed.degree ? q.eq("degree", ed.degree) : q.is("degree", null);
+              q = ed.field_of_study
+                ? q.eq("field_of_study", ed.field_of_study)
+                : q.is("field_of_study", null);
+              q = ed.start_date
+                ? q.eq("start_date", ed.start_date)
+                : q.is("start_date", null);
+              q = ed.end_date ? q.eq("end_date", ed.end_date) : q.is("end_date", null);
+              const { error } = await q;
               if (error) throw error;
             });
           }}
-        >
-          <Trash2 className="size-4" aria-hidden />
-        </Button>
+        />
       </div>
     </li>
   );
@@ -1667,22 +1740,31 @@ function CertRowActions({
             </Button>
           }
         />
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon-xs"
-          className="text-destructive"
-          onClick={() => {
-            if (!confirm("Remove this certificate?")) return;
+        <ConfirmDeleteButton
+          title="Remove certificate"
+          description="This will remove matching duplicate certificate entries."
+          onConfirm={() => {
             void run(async () => {
               const sb = createClient();
-              const { error } = await sb.from("certification_entries").delete().eq("id", c.id);
+              let q = sb
+                .from("certification_entries")
+                .delete()
+                .eq("user_id", userId)
+                .eq("name", c.name);
+              q = c.issuing_org
+                ? q.eq("issuing_org", c.issuing_org)
+                : q.is("issuing_org", null);
+              q = c.issue_date
+                ? q.eq("issue_date", c.issue_date)
+                : q.is("issue_date", null);
+              q = c.expiration_date
+                ? q.eq("expiration_date", c.expiration_date)
+                : q.is("expiration_date", null);
+              const { error } = await q;
               if (error) throw error;
             });
           }}
-        >
-          <Trash2 className="size-4" aria-hidden />
-        </Button>
+        />
       </div>
     </li>
   );
@@ -1804,22 +1886,25 @@ function LangRowActions({
             </Button>
           }
         />
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon-xs"
-          className="text-destructive"
-          onClick={() => {
-            if (!confirm("Remove this language?")) return;
+        <ConfirmDeleteButton
+          title="Remove language"
+          description="This will remove matching duplicate language entries."
+          onConfirm={() => {
             void run(async () => {
               const sb = createClient();
-              const { error } = await sb.from("language_entries").delete().eq("id", l.id);
+              let q = sb
+                .from("language_entries")
+                .delete()
+                .eq("user_id", userId)
+                .eq("name", l.name);
+              q = l.proficiency
+                ? q.eq("proficiency", l.proficiency)
+                : q.is("proficiency", null);
+              const { error } = await q;
               if (error) throw error;
             });
           }}
-        >
-          <Trash2 className="size-4" aria-hidden />
-        </Button>
+        />
       </div>
     </li>
   );
