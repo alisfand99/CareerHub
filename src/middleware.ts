@@ -5,6 +5,9 @@ const STATIC_EXT = /\.(?:css|js|mjs|map|json|woff2?|ttf|eot|svg|png|jpg|jpeg|gif
 
 export async function middleware(request: NextRequest) {
   const p = request.nextUrl.pathname;
+  if (p.startsWith("/ops-watch/login") || p.startsWith("/api/ops-watch/")) {
+    return NextResponse.next();
+  }
   // Never run Supabase session refresh on Next internals (chunks, HMR, etc.).
   // Missing exclusions here can make dev painfully slow or break asset loads.
   if (

@@ -1,4 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import {
+  isValidOpsSessionCookie,
+  OPS_WATCH_SESSION_COOKIE,
+} from "@/lib/ops-watch-auth";
 
 type ConnectionLogRow = {
   id: string;
@@ -20,6 +26,12 @@ function f(iso: string) {
 }
 
 export default async function OpsWatchPage() {
+  const cookieStore = await cookies();
+  const session = cookieStore.get(OPS_WATCH_SESSION_COOKIE)?.value;
+  if (!isValidOpsSessionCookie(session)) {
+    redirect("/ops-watch/login");
+  }
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -71,6 +83,18 @@ export default async function OpsWatchPage() {
         <p className="text-sm text-slate-600">
           Connected users, IP/device fingerprints, and activity timestamps.
         </p>
+        <form
+          action="/api/ops-watch/logout"
+          method="post"
+          className="pt-1"
+        >
+          <button
+            type="submit"
+            className="rounded-md border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50"
+          >
+            Logout panel
+          </button>
+        </form>
       </header>
 
       {error ? (
