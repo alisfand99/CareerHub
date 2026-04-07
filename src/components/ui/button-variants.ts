@@ -1,21 +1,21 @@
 import { cva, type VariantProps } from "class-variance-authority";
 
 export const buttonVariants = cva(
-  "group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding font-mono text-sm font-medium whitespace-nowrap transition-all duration-500 outline-none select-none focus-visible:border-cyan-400/50 focus-visible:ring-2 focus-visible:ring-cyan-400/25 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-2 aria-invalid:ring-destructive/30 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding font-mono text-sm font-medium whitespace-nowrap transition-all duration-500 outline-none select-none focus-visible:border-cyan-500/50 focus-visible:ring-2 focus-visible:ring-cyan-500/25 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-2 aria-invalid:ring-destructive/30 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
         default:
-          "normal-case tracking-normal border-cyan-400/50 bg-cyan-400/[0.12] text-cyan-100 hover:border-cyan-300/60 hover:bg-cyan-400/20 hover:text-white",
+          "normal-case tracking-normal border-cyan-600/20 bg-cyan-600 text-white shadow-sm hover:border-cyan-700/30 hover:bg-cyan-700",
         outline:
-          "text-[0.7rem] uppercase tracking-[0.22em] border-white/10 bg-white/5 text-white/90 backdrop-blur-sm hover:border-cyan-500/35 hover:bg-white/[0.08] hover:text-white aria-expanded:bg-white/[0.08]",
+          "text-[0.7rem] uppercase tracking-[0.22em] border-slate-200 bg-white/90 text-slate-700 shadow-sm backdrop-blur-sm hover:border-cyan-400/50 hover:bg-cyan-50/80 hover:text-slate-900 aria-expanded:bg-slate-50",
         secondary:
-          "normal-case tracking-normal border-white/10 bg-white/[0.06] text-white/85 hover:border-white/15 hover:bg-white/[0.1]",
+          "normal-case tracking-normal border-slate-200 bg-slate-100 text-slate-800 hover:border-slate-300 hover:bg-slate-200/90",
         ghost:
-          "normal-case tracking-normal text-white/70 hover:bg-white/[0.06] hover:text-white aria-expanded:bg-white/[0.06]",
+          "normal-case tracking-normal text-slate-600 hover:bg-slate-100 hover:text-slate-900 aria-expanded:bg-slate-100",
         destructive:
-          "normal-case tracking-normal border-red-500/30 bg-red-500/10 text-red-300 hover:border-red-400/40 hover:bg-red-500/15 focus-visible:ring-red-400/25",
-        link: "border-transparent text-sm normal-case tracking-normal text-cyan-400 underline-offset-4 hover:text-cyan-300 hover:underline",
+          "normal-case tracking-normal border-red-200 bg-red-50 text-red-700 hover:border-red-300 hover:bg-red-100 focus-visible:ring-red-400/25",
+        link: "border-transparent text-sm normal-case tracking-normal text-cyan-700 underline-offset-4 hover:text-cyan-800 hover:underline",
       },
       size: {
         default:

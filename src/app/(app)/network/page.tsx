@@ -39,7 +39,7 @@ export default async function NetworkPage() {
   const contacts = await fetchUserContacts(supabase, user.id);
 
   return (
-    <div className="mx-auto max-w-5xl">
+    <div className="mx-auto max-w-7xl">
       <NetworkConnections initialContacts={contacts} />
     </div>
   );

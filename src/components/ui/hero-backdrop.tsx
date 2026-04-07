@@ -7,30 +7,30 @@ type HeroBackdropProps = {
 };
 
 /**
- * Full-viewport canvas aligned with app shell: near-black, soft cyan/amber glow.
+ * Full-viewport canvas aligned with app shell: light slate, soft cyan accent.
  */
 export function HeroBackdrop({ children, className }: HeroBackdropProps) {
   return (
     <div
       className={cn(
-        "relative min-h-screen overflow-hidden bg-[#050505] text-white",
+        "relative min-h-screen overflow-hidden bg-slate-50 text-slate-900",
         className,
       )}
     >
       <div
-        className="pointer-events-none absolute -right-32 top-0 h-[28rem] w-[28rem] rounded-full bg-cyan-500/15 blur-[100px]"
+        className="pointer-events-none absolute -right-32 top-0 h-[28rem] w-[28rem] rounded-full bg-cyan-400/20 blur-[100px]"
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute -left-24 bottom-0 h-[22rem] w-[22rem] rounded-full bg-amber-500/10 blur-[90px]"
+        className="pointer-events-none absolute -left-24 bottom-0 h-[22rem] w-[22rem] rounded-full bg-amber-200/25 blur-[90px]"
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute inset-0 opacity-[0.2]"
+        className="pointer-events-none absolute inset-0 opacity-[0.35]"
         style={{
           backgroundImage: `
-            linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)
+            linear-gradient(rgba(148,163,184,0.15) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(148,163,184,0.15) 1px, transparent 1px)
           `,
           backgroundSize: "48px 48px",
           maskImage:

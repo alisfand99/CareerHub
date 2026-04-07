@@ -13,33 +13,58 @@ import {
   AddSkillDialog,
 } from "@/components/dashboard/dashboard-manual-forms";
 
-type HubProps = {
+export type PillarMetricLabels = {
+  primary: string;
+  secondary: string;
+};
+
+export type HubProps = {
   applyCount: number;
   bioAtomCount: number;
   networkCount: number;
   signedIn: boolean;
   configured: boolean;
+  pillarMetrics: {
+    apply: PillarMetricLabels;
+    bio: PillarMetricLabels;
+    network: PillarMetricLabels;
+  };
 };
 
-/** Minimal frame: top-left + bottom-right only */
-function CommandFrameCorners() {
-  const corner =
-    "pointer-events-none absolute border-cyan-500/20";
+function BranchConnectors() {
   return (
-    <>
-      <span
-        className={cn(corner, "left-4 top-4 h-5 w-5 border-l border-t md:left-6 md:top-6")}
-        aria-hidden
+    <svg
+      className="pointer-events-none absolute -left-10 top-1/2 hidden h-[min(100%,22rem)] w-14 -translate-y-1/2 text-cyan-400/75 lg:block"
+      viewBox="0 0 64 280"
+      preserveAspectRatio="none"
+      aria-hidden
+    >
+      <path
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeDasharray="5 5"
+        d="M 0 140 C 20 140 24 52 64 44"
       />
-      <span
-        className={cn(corner, "bottom-4 right-4 h-5 w-5 border-b border-r md:bottom-6 md:right-6")}
-        aria-hidden
+      <path
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeDasharray="5 5"
+        d="M 0 140 L 64 140"
       />
-    </>
+      <path
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeDasharray="5 5"
+        d="M 0 140 C 20 140 24 228 64 236"
+      />
+    </svg>
   );
 }
 
-function NeuralCoreOrb({
+function NeuralCoreOrbLight({
   isPulsing,
   onOpen,
 }: {
@@ -50,29 +75,21 @@ function NeuralCoreOrb({
     <motion.button
       type="button"
       onClick={onOpen}
-      className="group/core relative flex size-[8.5rem] shrink-0 items-center justify-center rounded-full outline-none ring-offset-[#050505] transition-shadow duration-500 hover:shadow-[0_0_40px_-8px_rgba(34,211,238,0.35)] focus-visible:ring-2 focus-visible:ring-cyan-400/50 md:size-[10.25rem]"
-      aria-label="Open command center"
-      whileHover={{ scale: 1.025 }}
+      className="group/core relative flex size-[7.5rem] shrink-0 items-center justify-center rounded-full bg-white outline-none ring-offset-slate-50 transition-shadow duration-500 hover:shadow-[0_0_48px_-6px_rgba(34,211,238,0.55)] focus-visible:ring-2 focus-visible:ring-cyan-400/50 md:size-[9.25rem]"
+      aria-label="Open career assistant"
+      whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
-      animate={{ scale: isPulsing ? 1.035 : 1 }}
+      animate={{ scale: isPulsing ? 1.03 : 1 }}
       transition={{ type: "spring", stiffness: 280, damping: 24 }}
+      style={{
+        boxShadow:
+          "0 0 0 1px rgba(34, 211, 238, 0.25), 0 12px 40px -8px rgba(34, 211, 238, 0.45), 0 4px 16px rgba(15, 23, 42, 0.06)",
+      }}
     >
-      {/* Slow outer ring — only while orchestrator is active */}
       <motion.span
-        className="pointer-events-none absolute inset-[-14%] rounded-full border border-cyan-500/25"
-        aria-hidden
-        animate={{ rotate: isPulsing ? 360 : 0 }}
-        transition={{
-          duration: isPulsing ? 56 : 0,
-          repeat: isPulsing ? Infinity : 0,
-          ease: "linear",
-        }}
-      />
-      <motion.span
-        className="absolute inset-[-28%] rounded-full bg-[radial-gradient(circle,rgba(34,211,238,0.14)_0%,transparent_68%)] blur-2xl"
+        className="pointer-events-none absolute inset-[-18%] rounded-full bg-[radial-gradient(circle,rgba(34,211,238,0.2)_0%,transparent_65%)] blur-xl"
         animate={{
-          opacity: isPulsing ? [0.55, 0.88, 0.55] : 0.5,
-          scale: isPulsing ? [1, 1.05, 1] : 1,
+          opacity: isPulsing ? [0.65, 1, 0.65] : 0.75,
         }}
         transition={{
           duration: isPulsing ? 2.4 : 0,
@@ -81,24 +98,8 @@ function NeuralCoreOrb({
         }}
         aria-hidden
       />
-      <span
-        className="absolute inset-[-10%] rounded-full bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.12)_0%,rgba(34,211,238,0.22)_35%,transparent_62%)] opacity-80"
-        aria-hidden
-      />
-      <span
-        className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_35%_28%,rgba(255,255,255,0.2)_0%,rgba(34,211,238,0.28)_22%,rgba(8,12,18,0.95)_58%,rgba(5,5,6,0.98)_100%)]"
-        style={{
-          boxShadow:
-            "inset 0 0 36px rgba(34,211,238,0.12), inset 0 1px 0 rgba(255,255,255,0.06)",
-        }}
-        aria-hidden
-      />
-      <span
-        className="absolute inset-[14%] rounded-full border border-white/[0.07] bg-[radial-gradient(circle_at_50%_50%,rgba(0,0,0,0.2)_0%,rgba(5,5,8,0.85)_100%)]"
-        aria-hidden
-      />
       <Sparkles
-        className="relative z-10 size-9 text-cyan-100/95 drop-shadow-[0_0_20px_rgba(34,211,238,0.45)] transition-transform duration-500 group-hover/core:scale-105 md:size-10"
+        className="relative z-10 size-8 text-cyan-600 drop-shadow-[0_0_12px_rgba(34,211,238,0.5)] transition-transform duration-500 group-hover/core:scale-105 md:size-9"
         aria-hidden
       />
     </motion.button>
@@ -111,6 +112,7 @@ export function CircularOrchestratorHub({
   networkCount,
   signedIn,
   configured,
+  pillarMetrics,
 }: HubProps) {
   const { isPulsing, flowTarget, setOpen } = useOrchestrator();
   const manualDisabled = !signedIn || !configured;
@@ -121,70 +123,57 @@ export function CircularOrchestratorHub({
 
   return (
     <section
-      className="relative overflow-hidden rounded-2xl border border-white/[0.09] bg-gradient-to-br from-[#080808] via-[#060606] to-[#050505] p-2 shadow-[inset_0_0_0_1px_rgba(34,211,238,0.06)]"
+      className="relative overflow-hidden rounded-2xl border border-cyan-200/40 bg-gradient-to-br from-white/90 via-slate-50/95 to-cyan-50/30 p-1 shadow-[0_24px_80px_-32px_rgba(15,23,42,0.15)] backdrop-blur-md"
       aria-label="Orchestrator command center"
     >
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_90%_70%_at_18%_45%,rgba(34,211,238,0.07),transparent_55%),radial-gradient(ellipse_60%_50%_at_92%_18%,rgba(245,158,11,0.04),transparent_50%)]"
-        aria-hidden
-      />
-      <div
-        className="pointer-events-none absolute inset-0 opacity-25 animate-neural-mesh-drift"
-        style={{
-          backgroundImage: `
-            linear-gradient(rgba(255, 255, 255, 0.028) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255, 255, 255, 0.022) 1px, transparent 1px)
-          `,
-          backgroundSize: "32px 32px",
-          maskImage:
-            "radial-gradient(ellipse 88% 78% at 50% 50%, black 25%, transparent 78%)",
-        }}
-        aria-hidden
-      />
-      <div
-        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_90%_80%_at_20%_30%,rgba(34,211,238,0.12),transparent_55%),radial-gradient(ellipse_60%_50%_at_95%_10%,rgba(8,145,178,0.06),transparent_50%)]"
         aria-hidden
       />
 
-      <CommandFrameCorners />
-
-      <div className="relative z-10 px-4 pb-8 pt-8 md:px-8 md:pb-10 md:pt-10">
-        <h2 className="mb-8 font-mono text-[0.6rem] font-medium uppercase tracking-[0.42em] text-cyan-500/55 md:mb-10 md:text-[0.65rem]">
-          Summary
-        </h2>
-
-        <div className="mx-auto grid max-w-5xl grid-cols-1 items-center gap-10 lg:grid-cols-[minmax(260px,1fr)_minmax(280px,1.15fr)] lg:gap-x-10 lg:gap-y-0">
-          <div className="flex justify-center lg:justify-end lg:pr-2">
-            <NeuralCoreOrb isPulsing={isPulsing} onOpen={() => setOpen(true)} />
+      <div className="relative z-10 px-5 pb-8 pt-9 md:px-10 md:pb-10 md:pt-11">
+        <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[minmax(200px,280px)_auto_1fr] lg:items-center lg:gap-6 xl:gap-10">
+          <div className="max-w-md space-y-3">
+            <p className="font-mono text-[0.6rem] font-medium uppercase tracking-[0.42em] text-slate-500 md:text-[0.65rem]">
+              Summary
+            </p>
+            <h1 className="font-serif text-3xl font-normal tracking-tight text-slate-900 md:text-4xl">
+              Career-Hub AI
+            </h1>
+            <p className="text-base text-slate-600 md:text-lg">
+              Career command center
+            </p>
           </div>
 
-          <div className="flex min-w-0 flex-col justify-center gap-4">
-              <PillarMindCard
+          <div className="flex justify-center lg:justify-center">
+            <NeuralCoreOrbLight isPulsing={isPulsing} onOpen={() => setOpen(true)} />
+          </div>
+
+          <div className="relative min-w-0 lg:pl-4">
+            <BranchConnectors />
+            <div className="relative z-10 flex flex-col gap-3.5 lg:gap-4">
+              <PillarGlassCard
                 href="/apply-hub"
                 title="Apply Hub"
-                subtitle="Pipeline · posting insights"
+                metrics={pillarMetrics.apply}
                 count={applyCount}
                 icon={Briefcase}
                 highlight={applyActive}
-                manual={
-                  <AddJobDialog disabled={manualDisabled} compactTrigger />
-                }
+                manual={<AddJobDialog disabled={manualDisabled} compactTrigger />}
               />
-              <PillarMindCard
+              <PillarGlassCard
                 href="/bio-vault"
                 title="Bio-Vault"
-                subtitle="Skills · evidence"
+                metrics={pillarMetrics.bio}
                 count={bioAtomCount}
                 icon={Boxes}
                 highlight={bioActive}
-                manual={
-                  <AddSkillDialog disabled={manualDisabled} compactTrigger />
-                }
+                manual={<AddSkillDialog disabled={manualDisabled} compactTrigger />}
               />
-              <PillarMindCard
+              <PillarGlassCard
                 href="/network"
                 title="Network CRM"
-                subtitle="Contacts · referrals"
+                metrics={pillarMetrics.network}
                 count={networkCount}
                 icon={Network}
                 highlight={netActive}
@@ -192,24 +181,26 @@ export function CircularOrchestratorHub({
                   <AddContactDialog disabled={manualDisabled} compactTrigger />
                 }
               />
+            </div>
           </div>
         </div>
       </div>
 
-      <p className="relative z-10 border-t border-white/[0.06] bg-black/30 px-4 py-3 text-center font-serif text-xs font-light leading-relaxed text-white/40 md:px-8">
-        Intent routes to each pillar. Open the{" "}
-        <span className="text-cyan-400/75">command center</span> above — or
-        use <span className="font-mono text-white/50">+</span> on hover to add
+      <p className="relative z-10 border-t border-slate-200/80 bg-white/50 px-4 py-3 text-center text-xs leading-relaxed text-slate-500 md:px-8">
+        Tap the{" "}
+        <span className="font-medium text-cyan-700">sparkle core</span> for the
+        career assistant — or use{" "}
+        <span className="font-mono text-slate-600">+</span> on each card to add
         manually.
       </p>
     </section>
   );
 }
 
-function PillarMindCard({
+function PillarGlassCard({
   href,
   title,
-  subtitle,
+  metrics,
   count,
   icon: Icon,
   highlight,
@@ -217,7 +208,7 @@ function PillarMindCard({
 }: {
   href: string;
   title: string;
-  subtitle: string;
+  metrics: PillarMetricLabels;
   count: number;
   icon: LucideIcon;
   highlight: boolean;
@@ -226,56 +217,60 @@ function PillarMindCard({
   return (
     <div
       className={cn(
-        "group/card relative overflow-hidden rounded-xl border border-white/[0.07] bg-white/[0.025] backdrop-blur-sm transition-all duration-500",
-        "hover:border-white/[0.11] hover:bg-white/[0.035]",
-        highlight && "border-cyan-500/25 bg-white/[0.04]",
+        "group/card relative overflow-hidden rounded-2xl border bg-white/75 shadow-sm backdrop-blur-md transition-all duration-500",
+        highlight
+          ? "border-cyan-300/70 shadow-[0_12px_40px_-20px_rgba(34,211,238,0.35)]"
+          : "border-cyan-100/80 hover:border-cyan-200/90 hover:shadow-md",
       )}
     >
-      <p className="pointer-events-none absolute right-3 top-2 font-mono text-[0.55rem] uppercase tracking-[0.2em] text-white/0 transition-opacity duration-300 group-hover/card:text-white/35">
-        Routed
-      </p>
-
-      <div className="relative flex items-center gap-3 px-4 py-3 md:gap-3 md:px-4 md:py-3.5">
+      <div className="flex items-stretch gap-2 px-4 py-3.5 md:px-4 md:py-4">
         <Link
           href={href}
-          className="flex min-w-0 flex-1 items-center gap-3 rounded-lg outline-none ring-offset-[#050505] focus-visible:ring-2 focus-visible:ring-cyan-400/40 md:gap-3.5"
+          className="flex min-w-0 flex-1 flex-col gap-3 rounded-lg outline-none ring-offset-white focus-visible:ring-2 focus-visible:ring-cyan-400/40"
         >
-          <span
-            className={cn(
-              "flex size-10 shrink-0 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.05]",
-              highlight && "border-cyan-500/20 bg-cyan-500/[0.08]",
-            )}
-          >
-            <Icon
+          <div className="flex items-start gap-3">
+            <span
               className={cn(
-                "size-[1.15rem]",
-                highlight ? "text-cyan-200/90" : "text-white/55",
+                "flex size-10 shrink-0 items-center justify-center rounded-xl border bg-slate-50",
+                highlight
+                  ? "border-cyan-200 bg-cyan-50"
+                  : "border-slate-200/90",
               )}
+            >
+              <Icon
+                className={cn(
+                  "size-[1.15rem]",
+                  highlight ? "text-cyan-700" : "text-slate-600",
+                )}
+                aria-hidden
+              />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="font-sans text-sm font-semibold tracking-tight text-slate-900">
+                {title}
+              </p>
+              <p className="mt-2 text-[0.65rem] text-slate-500">
+                Total in workspace:{" "}
+                <span className="tabular-nums font-medium text-slate-700">
+                  {count}
+                </span>
+              </p>
+            </div>
+            <ChevronRight
+              className="mt-0.5 size-4 shrink-0 text-slate-300 transition-colors group-hover/card:text-cyan-600"
               aria-hidden
             />
-          </span>
-          <div className="min-w-0 flex-1 text-left">
-            <p className="truncate font-mono text-[0.7rem] font-medium uppercase tracking-[0.16em] text-white/88">
-              {title}
-            </p>
-            <p className="mt-0.5 truncate font-serif text-xs font-light text-white/45">
-              {subtitle}
-            </p>
           </div>
-          <span
-            className={cn(
-              "shrink-0 rounded-full border border-white/10 bg-white/[0.05] px-2.5 py-0.5 font-mono text-xs tabular-nums text-white/75",
-              highlight && "border-cyan-500/20 text-cyan-100/90",
-            )}
-          >
-            {count}
-          </span>
-          <ChevronRight
-            className="size-4 shrink-0 text-white/25 transition-colors group-hover/card:text-white/45"
-            aria-hidden
-          />
+          <div className="flex flex-wrap gap-2">
+            <span className="inline-flex items-center rounded-full bg-cyan-100 px-2.5 py-1 text-[0.7rem] font-medium tabular-nums text-cyan-900">
+              {metrics.primary}
+            </span>
+            <span className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-1 text-[0.7rem] font-medium tabular-nums text-slate-600">
+              {metrics.secondary}
+            </span>
+          </div>
         </Link>
-        <div className="relative z-20 shrink-0">{manual}</div>
+        <div className="flex shrink-0 items-start pt-0.5">{manual}</div>
       </div>
     </div>
   );

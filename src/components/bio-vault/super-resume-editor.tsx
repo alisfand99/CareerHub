@@ -137,20 +137,25 @@ export function SuperResumeEditor({
 
   return (
     <div className="mx-auto max-w-4xl space-y-8 pb-12">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Bio-Vault</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Your living super-resume: one place for every role, skill, and story
-          you might use across different targets. Add and edit sections like a
-          profile page — paste résumés or notes into the Assistant and it will
-          fill in what it can here.
+      <header className="space-y-2">
+        <p className="font-mono text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-cyan-600">
+          Bio-Vault
         </p>
-      </div>
+        <h1 className="font-serif text-3xl font-normal tracking-tight text-slate-900 md:text-4xl">
+          Skills · evidence
+        </h1>
+        <p className="max-w-2xl text-slate-600">
+          The verified portfolio for your career narrative — structured roles,
+          skills, proof, and credentials in one vault. Paste résumés into the
+          Assistant and it fills what it can here.
+        </p>
+      </header>
 
+      <div className="rounded-2xl border border-cyan-100/80 bg-white/90 p-6 shadow-[0_24px_80px_-40px_rgba(15,23,42,0.1)] backdrop-blur-sm md:p-8">
       {dataLoadWarning ? (
         <div
           role="status"
-          className="rounded-lg border border-amber-500/35 bg-amber-500/10 px-4 py-3 text-sm text-amber-950 dark:border-amber-400/30 dark:bg-amber-400/10 dark:text-amber-50"
+          className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950"
         >
           {dataLoadWarning}
         </div>
@@ -505,6 +510,7 @@ export function SuperResumeEditor({
           </CardContent>
         </Card>
       ) : null}
+      </div>
     </div>
   );
 }

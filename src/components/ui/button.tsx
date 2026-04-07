@@ -5,12 +5,15 @@ import { Button as ButtonPrimitive } from "@base-ui/react/button";
 import { cn } from "@/lib/utils";
 import { buttonVariants, type ButtonVariantProps } from "@/components/ui/button-variants";
 
+export type ButtonProps = Omit<ButtonPrimitive.Props, "size"> &
+  ButtonVariantProps;
+
 function Button({
   className,
   variant = "default",
   size = "default",
   ...props
-}: ButtonPrimitive.Props & ButtonVariantProps) {
+}: ButtonProps) {
   return (
     <ButtonPrimitive
       data-slot="button"

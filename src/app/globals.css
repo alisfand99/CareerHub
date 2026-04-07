@@ -37,10 +37,10 @@
   }
 }
 
-/* Career-Hub “alisfand-style”: near-black canvas, glass cards, cyan accent */
+/* Career-Hub executive light: slate canvas, glass cards, cyan accent (matches promo UI) */
 @layer components {
   .ch-shell-bg {
-    @apply relative min-h-screen bg-[#050505] text-white;
+    @apply relative min-h-screen bg-slate-50 text-slate-900;
   }
 
   .ch-shell-bg::before {
@@ -49,68 +49,74 @@
     position: fixed;
     inset: 0;
     z-index: 0;
-    background-image:
-      linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-    background-size: 64px 64px;
-    opacity: 0.35;
-    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 20%, transparent 70%);
+    background:
+      radial-gradient(ellipse 85% 65% at 50% -10%, rgba(34, 211, 238, 0.09), transparent 55%),
+      radial-gradient(ellipse 70% 50% at 100% 40%, rgba(8, 145, 178, 0.06), transparent 50%),
+      linear-gradient(rgba(148, 163, 184, 0.12) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(148, 163, 184, 0.12) 1px, transparent 1px);
+    background-size:
+      auto,
+      auto,
+      40px 40px,
+      40px 40px;
+    opacity: 1;
+    mask-image: radial-gradient(ellipse 95% 80% at 50% 45%, black 30%, transparent 100%);
   }
 
   .ch-blob-cyan {
     pointer-events: none;
     position: fixed;
-    width: 42rem;
-    height: 42rem;
+    width: 38rem;
+    height: 38rem;
     border-radius: 9999px;
     background: radial-gradient(
       circle,
-      rgba(34, 211, 238, 0.12) 0%,
-      transparent 70%
+      rgba(34, 211, 238, 0.18) 0%,
+      transparent 68%
     );
-    filter: blur(80px);
-    top: -10%;
-    right: -15%;
+    filter: blur(88px);
+    top: -12%;
+    right: -12%;
     z-index: 0;
-    opacity: 0.9;
+    opacity: 0.75;
   }
 
   .ch-blob-amber {
     pointer-events: none;
     position: fixed;
-    width: 36rem;
-    height: 36rem;
+    width: 28rem;
+    height: 28rem;
     border-radius: 9999px;
     background: radial-gradient(
       circle,
-      rgba(245, 158, 11, 0.08) 0%,
+      rgba(251, 191, 36, 0.12) 0%,
       transparent 70%
     );
     filter: blur(72px);
-    bottom: 10%;
-    left: -10%;
+    bottom: 5%;
+    left: -8%;
     z-index: 0;
-    opacity: 0.85;
+    opacity: 0.65;
   }
 
   .ch-eyebrow {
-    @apply font-mono text-[0.65rem] font-medium uppercase tracking-[0.35em] text-cyan-500 md:text-xs md:tracking-[0.4em];
+    @apply font-mono text-[0.65rem] font-medium uppercase tracking-[0.35em] text-slate-500 md:text-xs md:tracking-[0.4em];
   }
 
   .ch-display {
-    @apply font-serif text-3xl font-normal leading-[1.1] tracking-tight text-white md:text-4xl lg:text-5xl;
+    @apply font-serif text-3xl font-normal leading-[1.1] tracking-tight text-slate-900 md:text-4xl lg:text-5xl;
   }
 
   .ch-body {
-    @apply font-serif text-sm font-light leading-relaxed text-white/70 md:text-base;
+    @apply text-sm font-normal leading-relaxed text-slate-600 md:text-base;
   }
 
   .ch-glass-panel {
-    @apply border border-white/10 bg-white/[0.05] backdrop-blur-sm transition-all duration-500;
+    @apply border border-white/70 bg-white/70 shadow-sm backdrop-blur-md transition-all duration-500;
   }
 
   .ch-glass-panel-hover {
-    @apply hover:border-cyan-500/30 hover:bg-white/[0.07];
+    @apply hover:border-cyan-300/50 hover:shadow-md;
   }
 
   .ch-glass-card {
@@ -118,14 +124,14 @@
   }
 
   .ch-section-rail {
-    @apply border-l border-cyan-500/30 pl-6 md:pl-8;
+    @apply border-l border-cyan-500/35 pl-6 md:pl-8;
   }
 
   .ch-mobile-dock {
-    @apply fixed bottom-4 left-4 right-4 z-40 rounded-2xl border border-white/10 bg-[#0a0a0a]/80 p-3 shadow-2xl backdrop-blur-xl md:hidden;
+    @apply fixed bottom-4 left-4 right-4 z-40 rounded-2xl border border-slate-200/90 bg-white/90 p-3 shadow-xl backdrop-blur-xl md:hidden;
     box-shadow:
       0 -1px 0 0 rgba(34, 211, 238, 0.35),
-      0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      0 25px 50px -12px rgba(15, 23, 42, 0.12);
   }
 }
 
@@ -200,6 +206,6 @@
   }
 
   html {
-    @apply font-serif;
+    @apply font-sans;
   }
 }

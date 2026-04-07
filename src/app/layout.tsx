@@ -1,8 +1,14 @@
 import type { Metadata } from "next";
-import { JetBrains_Mono, Lora } from "next/font/google";
+import { Inter, JetBrains_Mono, Lora } from "next/font/google";
 import "./globals.css";
 import { CRITICAL_CSS_FALLBACK } from "@/lib/critical-css-fallback";
 import { cn } from "@/lib/utils";
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+});
 
 const lora = Lora({
   subsets: ["latin"],
@@ -34,7 +40,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn("dark", lora.variable, jetbrainsMono.variable)}
+      className={cn(inter.variable, lora.variable, jetbrainsMono.variable)}
     >
       <head>
         <style

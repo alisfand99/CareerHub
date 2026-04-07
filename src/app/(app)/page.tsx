@@ -83,6 +83,20 @@ export default async function DashboardPage() {
           networkCount={stats.contactsCount}
           signedIn={signedIn}
           configured={configured}
+          pillarMetrics={{
+            apply: {
+              primary: `${stats.jobsTotal} roles`,
+              secondary: `${stats.jobsByStatus.applied} applied`,
+            },
+            bio: {
+              primary: `${stats.skillsCount} skills`,
+              secondary: `${stats.projectsCount} projects`,
+            },
+            network: {
+              primary: `${stats.contactsCount} contacts`,
+              secondary: `${stats.referralLinksCount} referrals`,
+            },
+          }}
         />
       ) : null}
 
@@ -116,11 +130,11 @@ export default async function DashboardPage() {
 
       {configured ? (
         <div className="flex w-full min-w-0 flex-col gap-12 md:gap-16">
-          <div className="flex flex-col gap-4 border-b border-white/[0.06] pb-8 md:flex-row md:items-end md:justify-between">
-            <div className="ch-section-rail min-w-0 space-y-2 border-cyan-500/20">
+          <div className="flex flex-col gap-4 border-b border-slate-200/90 pb-8 md:flex-row md:items-end md:justify-between">
+            <div className="ch-section-rail min-w-0 space-y-2 border-cyan-500/35">
               <p className="ch-eyebrow !text-[0.55rem]">Metrics</p>
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-2 font-serif text-sm text-white/55">
-                <LayoutGrid className="size-4 shrink-0 text-cyan-500/70" aria-hidden />
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-slate-600">
+                <LayoutGrid className="size-4 shrink-0 text-cyan-600" aria-hidden />
                 <span>Explore by pillar</span>
                 <DashboardTourDialog />
               </div>
@@ -130,14 +144,14 @@ export default async function DashboardPage() {
           <section aria-labelledby="dash-metrics-apply" className="min-w-0">
             <h2
               id="dash-metrics-apply"
-              className="mb-4 font-mono text-[0.65rem] font-medium uppercase tracking-[0.28em] text-cyan-500/70"
+              className="mb-4 font-mono text-[0.65rem] font-medium uppercase tracking-[0.28em] text-cyan-700"
             >
               Apply Hub
             </h2>
             <Card className="min-w-0">
               <CardHeader>
                 <div className="flex items-center gap-2">
-                  <TrendingUp className="size-4 text-cyan-400/80" aria-hidden />
+                  <TrendingUp className="size-4 text-cyan-600" aria-hidden />
                   <CardTitle>Pipeline load</CardTitle>
                 </div>
                 <CardDescription>
@@ -148,17 +162,17 @@ export default async function DashboardPage() {
               <CardContent className="space-y-4">
                 {pipelineEntries.map(([key, count]) => (
                   <div key={key}>
-                    <div className="mb-1.5 flex items-center justify-between font-mono text-xs uppercase tracking-wider text-white/70">
-                      <span className="font-medium text-white/90">
+                    <div className="mb-1.5 flex items-center justify-between font-mono text-xs uppercase tracking-wider text-slate-500">
+                      <span className="font-medium text-slate-800">
                         {jobLabels[key] ?? key}
                       </span>
-                      <span className="tabular-nums text-cyan-500/80">
+                      <span className="tabular-nums text-cyan-700">
                         {count}
                       </span>
                     </div>
-                    <div className="h-2 overflow-hidden rounded-full bg-white/[0.08]">
+                    <div className="h-2 overflow-hidden rounded-full bg-slate-200/90">
                       <div
-                        className="h-full rounded-full bg-cyan-500/70 transition-all duration-500"
+                        className="h-full rounded-full bg-cyan-500 transition-all duration-500"
                         style={{
                           width: `${(count / pipelineMax) * 100}%`,
                         }}
@@ -173,7 +187,7 @@ export default async function DashboardPage() {
           <section aria-labelledby="dash-metrics-bio" className="min-w-0">
             <h2
               id="dash-metrics-bio"
-              className="mb-4 font-mono text-[0.65rem] font-medium uppercase tracking-[0.28em] text-cyan-500/70"
+              className="mb-4 font-mono text-[0.65rem] font-medium uppercase tracking-[0.28em] text-cyan-700"
             >
               Bio-Vault
             </h2>
@@ -185,27 +199,27 @@ export default async function DashboardPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="grid gap-8 sm:grid-cols-2">
-                <div className="min-w-0 rounded-xl border border-white/10 bg-white/[0.03] p-6 transition-all duration-500 hover:border-cyan-500/25 sm:p-8">
-                  <p className="font-mono text-[0.65rem] uppercase tracking-[0.2em] text-cyan-500/80">
+                <div className="min-w-0 rounded-xl border border-slate-200/90 bg-white/80 p-6 shadow-sm transition-all duration-500 hover:border-cyan-200/90 sm:p-8">
+                  <p className="font-mono text-[0.65rem] uppercase tracking-[0.2em] text-cyan-700">
                     Vault messages
                   </p>
-                  <p className="mt-3 font-serif text-3xl font-light tabular-nums tracking-tight text-white">
+                  <p className="mt-3 font-serif text-3xl font-light tabular-nums tracking-tight text-slate-900">
                     {stats.bioMessagesCount}
                   </p>
-                  <p className="mt-3 font-serif text-xs font-light leading-relaxed text-white/50">
+                  <p className="mt-3 text-xs font-normal leading-relaxed text-slate-500">
                     Conversations you’ve had with the career assistant.
                   </p>
                 </div>
-                <div className="min-w-0 rounded-xl border border-white/10 bg-white/[0.03] p-6 transition-all duration-500 hover:border-cyan-500/25 sm:p-8">
-                  <p className="font-mono text-[0.65rem] uppercase tracking-[0.2em] text-cyan-500/80">
+                <div className="min-w-0 rounded-xl border border-slate-200/90 bg-white/80 p-6 shadow-sm transition-all duration-500 hover:border-cyan-200/90 sm:p-8">
+                  <p className="font-mono text-[0.65rem] uppercase tracking-[0.2em] text-cyan-700">
                     Structured atoms
                   </p>
-                  <p className="mt-3 font-serif text-3xl font-light tabular-nums tracking-tight text-white">
+                  <p className="mt-3 font-serif text-3xl font-light tabular-nums tracking-tight text-slate-900">
                     {stats.skillsCount +
                       stats.projectsCount +
                       stats.experienceCount}
                   </p>
-                  <p className="mt-3 font-serif text-xs font-light leading-relaxed text-white/50">
+                  <p className="mt-3 text-xs font-normal leading-relaxed text-slate-500">
                     Powers tailored résumés and job fit insights.
                   </p>
                 </div>
@@ -216,7 +230,7 @@ export default async function DashboardPage() {
           <section aria-labelledby="dash-metrics-network" className="min-w-0">
             <h2
               id="dash-metrics-network"
-              className="mb-4 font-mono text-[0.65rem] font-medium uppercase tracking-[0.28em] text-cyan-500/70"
+              className="mb-4 font-mono text-[0.65rem] font-medium uppercase tracking-[0.28em] text-cyan-700"
             >
               Network CRM
             </h2>
@@ -228,22 +242,22 @@ export default async function DashboardPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="grid gap-8 sm:grid-cols-2">
-                <div className="min-w-0 rounded-xl border border-white/10 bg-white/[0.03] p-6 transition-all duration-500 hover:border-cyan-500/25 sm:p-8">
-                  <p className="font-mono text-[0.65rem] uppercase tracking-[0.2em] text-cyan-500/80">
+                <div className="min-w-0 rounded-xl border border-slate-200/90 bg-white/80 p-6 shadow-sm transition-all duration-500 hover:border-cyan-200/90 sm:p-8">
+                  <p className="font-mono text-[0.65rem] uppercase tracking-[0.2em] text-cyan-700">
                     Contacts
                   </p>
-                  <p className="mt-3 font-serif text-3xl font-light tabular-nums tracking-tight text-white">
+                  <p className="mt-3 font-serif text-3xl font-light tabular-nums tracking-tight text-slate-900">
                     {stats.contactsCount}
                   </p>
                 </div>
-                <div className="min-w-0 rounded-xl border border-white/10 bg-white/[0.03] p-6 transition-all duration-500 hover:border-cyan-500/25 sm:p-8">
-                  <p className="font-mono text-[0.65rem] uppercase tracking-[0.2em] text-cyan-500/80">
+                <div className="min-w-0 rounded-xl border border-slate-200/90 bg-white/80 p-6 shadow-sm transition-all duration-500 hover:border-cyan-200/90 sm:p-8">
+                  <p className="font-mono text-[0.65rem] uppercase tracking-[0.2em] text-cyan-700">
                     Referral mappings
                   </p>
-                  <p className="mt-3 font-serif text-3xl font-light tabular-nums tracking-tight text-white">
+                  <p className="mt-3 font-serif text-3xl font-light tabular-nums tracking-tight text-slate-900">
                     {stats.referralLinksCount}
                   </p>
-                  <p className="mt-3 font-serif text-xs font-light leading-relaxed text-white/50">
+                  <p className="mt-3 text-xs font-normal leading-relaxed text-slate-500">
                     Links between people and the roles you’re pursuing.
                   </p>
                 </div>

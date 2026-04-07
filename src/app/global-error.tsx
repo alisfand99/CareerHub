@@ -22,14 +22,14 @@ export default function GlobalError({
   }, [error]);
 
   return (
-    <html lang="en" className="dark">
+    <html lang="en">
       <head>
         <style
           id="ch-critical-css-fallback"
           dangerouslySetInnerHTML={{ __html: CRITICAL_CSS_FALLBACK }}
         />
       </head>
-      <body className="min-h-screen font-serif antialiased">
+      <body className="min-h-screen bg-slate-50 font-sans antialiased">
         <div className="mx-auto flex min-h-screen max-w-lg flex-col items-center justify-center gap-6 px-6 py-16 text-center">
           <div className="space-y-2">
             <h1 className="text-lg font-semibold tracking-tight">

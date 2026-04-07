@@ -29,11 +29,23 @@ function triggerBtn(disabled?: boolean) {
   );
 }
 
+function promoBoardTrigger(disabled?: boolean) {
+  return (
+    <Button
+      type="button"
+      variant="default"
+      size="sm"
+      className="h-9 gap-1.5 px-4 text-xs font-semibold shadow-sm"
+      disabled={disabled}
+    />
+  );
+}
+
 function hubIconTrigger(disabled: boolean | undefined, ariaLabel: string) {
   return (
     <button
       type="button"
-      className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg text-cyan-200/65 opacity-0 shadow-none transition-all duration-200 group-hover/card:opacity-100 hover:bg-white/[0.08] hover:text-cyan-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/45 disabled:pointer-events-none disabled:opacity-0"
+      className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg text-cyan-600/80 opacity-0 shadow-none transition-all duration-200 group-hover/card:opacity-100 hover:bg-cyan-50 hover:text-cyan-800 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/45 disabled:pointer-events-none disabled:opacity-0"
       disabled={disabled}
       aria-label={ariaLabel}
     />
@@ -43,10 +55,13 @@ function hubIconTrigger(disabled: boolean | undefined, ariaLabel: string) {
 export function AddJobDialog({
   disabled,
   compactTrigger,
+  promoTrigger,
 }: {
   disabled?: boolean;
   /** Icon-only trigger, visible on card hover (dashboard neural hub). */
   compactTrigger?: boolean;
+  /** Cyan CTA styled like “Add board” on Apply Hub. */
+  promoTrigger?: boolean;
 }) {
   const router = useRouter();
   const { triggerManualPulse } = useOrchestrator();
@@ -100,11 +115,19 @@ export function AddJobDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
         render={
-          compactTrigger ? hubIconTrigger(disabled, "Add job manually") : triggerBtn(disabled)
+          compactTrigger
+            ? hubIconTrigger(disabled, "Add job manually")
+            : promoTrigger
+              ? promoBoardTrigger(disabled)
+              : triggerBtn(disabled)
         }
       >
-        <Plus className={compactTrigger ? "size-4" : "size-3.5"} />
-        {compactTrigger ? null : "Add job"}
+        <Plus
+          className={
+            compactTrigger ? "size-4" : promoTrigger ? "size-3.5" : "size-3.5"
+          }
+        />
+        {compactTrigger ? null : promoTrigger ? "Add board" : "Add job"}
       </DialogTrigger>
       <DialogContent className="sm:max-w-md" showCloseButton>
         <DialogHeader>

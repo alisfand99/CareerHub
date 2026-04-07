@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import {
   Sheet,
@@ -51,11 +50,11 @@ function NavItems({ mobile }: { mobile?: boolean }) {
       "flex items-center gap-2.5 rounded-lg px-3 py-2.5 font-mono text-[0.7rem] font-medium uppercase tracking-[0.2em] transition-all duration-500",
       mobile
         ? active
-          ? "border border-cyan-500/35 bg-white/[0.08] text-cyan-200"
-          : "border border-transparent text-white/60 hover:border-white/10 hover:bg-white/[0.04] hover:text-white/90"
+          ? "border border-cyan-200 bg-cyan-50 text-cyan-800"
+          : "border border-transparent text-slate-500 hover:border-slate-200 hover:bg-slate-50 hover:text-slate-900"
         : active
-          ? "border border-cyan-500/30 bg-white/[0.07] text-cyan-100 shadow-[0_0_28px_-8px_rgba(34,211,238,0.35)]"
-          : "border border-transparent text-white/55 hover:border-white/10 hover:bg-white/[0.04] hover:text-white/85",
+          ? "border border-cyan-200/80 bg-cyan-50/90 text-cyan-800 shadow-sm"
+          : "border border-transparent text-slate-500 hover:border-slate-200 hover:bg-white/80 hover:text-slate-800",
     );
 
   return (
@@ -72,12 +71,12 @@ function NavItems({ mobile }: { mobile?: boolean }) {
             key={href}
             render={<Link href={href} className={className} />}
           >
-            <Icon className="size-4 shrink-0 text-cyan-500/80" aria-hidden />
+            <Icon className="size-4 shrink-0 text-cyan-600" aria-hidden />
             {label}
           </SheetClose>
         ) : (
           <Link key={href} href={href} className={className}>
-            <Icon className="size-4 shrink-0 text-cyan-500/70" aria-hidden />
+            <Icon className="size-4 shrink-0 text-cyan-600" aria-hidden />
             {label}
           </Link>
         );
@@ -106,8 +105,8 @@ function DesktopTopNav() {
             className={cn(
               "rounded-md px-3 py-2 font-mono text-[0.65rem] font-medium uppercase tracking-[0.22em] transition-all duration-500",
               active
-                ? "text-cyan-300"
-                : "text-white/45 hover:text-white/80",
+                ? "text-cyan-700 underline decoration-cyan-500 decoration-2 underline-offset-8"
+                : "text-slate-500 hover:text-slate-800",
             )}
           >
             {label}
@@ -131,40 +130,13 @@ export function AppShell({
   const { setOpen, isPulsing: orchestratorPulsing } = useOrchestrator();
 
   return (
-    <div className="ch-shell-bg flex min-h-screen w-full">
+    <div className="ch-shell-bg flex min-h-screen w-full max-w-[100vw] overflow-x-hidden">
       <div className="ch-blob-cyan" aria-hidden />
       <div className="ch-blob-amber" aria-hidden />
 
-      <aside className="relative z-[1] hidden w-[17rem] shrink-0 flex-col border-r border-white/[0.08] bg-[#050505]/80 backdrop-blur-xl md:flex">
-        <div className="flex h-[3.75rem] items-center gap-3 border-b border-white/[0.06] px-5">
-          <div className="flex size-9 items-center justify-center rounded-lg border border-cyan-500/25 bg-cyan-500/10 text-cyan-300 shadow-[0_0_24px_-6px_rgba(34,211,238,0.45)]">
-            <Sparkles className="size-[1.15rem]" aria-hidden />
-          </div>
-          <div className="min-w-0 leading-tight">
-            <p className="truncate font-serif text-sm font-medium tracking-tight text-white">
-              Career-Hub AI
-            </p>
-            <p className="ch-eyebrow mt-0.5 !text-[0.55rem] !tracking-[0.32em] text-cyan-500/90">
-              Command center
-            </p>
-          </div>
-        </div>
-        <ScrollArea className="flex-1 py-6">
-          <NavItems />
-        </ScrollArea>
-        <Separator className="bg-white/[0.06]" />
-        <div className="p-4">
-          <UserMenu email={userEmail} />
-        </div>
-      </aside>
-
       <div className="relative z-[1] flex min-w-0 flex-1 flex-col">
         <header
-          className="sticky top-0 z-40 flex h-14 items-center gap-3 border-b border-white/[0.06] px-4 md:hidden"
-          style={{
-            background:
-              "linear-gradient(to bottom, rgba(5,5,5,0.94) 0%, rgba(5,5,5,0.82) 55%, rgba(5,5,5,0.65) 100%)",
-          }}
+          className="sticky top-0 z-40 flex h-14 items-center gap-3 border-b border-slate-200/90 bg-white/90 px-4 backdrop-blur-md md:hidden"
         >
           <Sheet>
             <SheetTrigger
@@ -176,11 +148,11 @@ export function AppShell({
             </SheetTrigger>
             <SheetContent
               side="left"
-              className="w-80 border-white/10 bg-[#080808]/95 p-0 backdrop-blur-xl"
+              className="w-80 border-slate-200/90 bg-white/95 p-0 backdrop-blur-xl"
             >
-              <SheetHeader className="border-b border-white/10 p-5 text-left">
-                <SheetTitle className="flex items-center gap-2 font-serif text-lg font-normal text-white">
-                  <Sparkles className="size-5 text-cyan-400" aria-hidden />
+              <SheetHeader className="border-b border-slate-200/90 p-5 text-left">
+                <SheetTitle className="flex items-center gap-2 font-serif text-lg font-normal text-slate-900">
+                  <Sparkles className="size-5 text-cyan-600" aria-hidden />
                   Career-Hub AI
                 </SheetTitle>
                 <p className="ch-eyebrow pt-1 !text-[0.55rem]">Navigation</p>
@@ -188,7 +160,7 @@ export function AppShell({
               <div className="py-5">
                 <NavItems mobile />
               </div>
-              <Separator className="bg-white/[0.06]" />
+              <Separator className="bg-slate-200/80" />
               <div className="p-4">
                 <UserMenu email={userEmail} />
               </div>
@@ -196,7 +168,7 @@ export function AppShell({
           </Sheet>
           <div className="min-w-0 flex-1">
             <p className="ch-eyebrow">{title}</p>
-            <span className="mt-0.5 block truncate font-serif text-base font-medium text-white">
+            <span className="mt-0.5 block truncate font-serif text-base font-medium text-slate-900">
               Career-Hub AI
             </span>
           </div>
@@ -205,80 +177,74 @@ export function AppShell({
             variant="outline"
             size="icon"
             className={cn(
-              "shrink-0 border-cyan-500/30 transition-all duration-500",
+              "shrink-0 border-cyan-300/80 bg-white transition-all duration-500",
               orchestratorPulsing &&
-                "shadow-[0_0_20px_-4px_rgba(34,211,238,0.45)] ring-1 ring-cyan-400/40",
+                "shadow-[0_0_20px_-4px_rgba(34,211,238,0.45)] ring-2 ring-cyan-400/35",
             )}
             aria-label="Open career assistant"
             onClick={() => setOpen(true)}
           >
             <MessageSquare
               className={cn(
-                "size-4 text-cyan-400",
+                "size-4 text-cyan-600",
                 orchestratorPulsing && "animate-pulse",
               )}
             />
           </Button>
         </header>
 
-        <header
-          className="sticky top-0 z-30 hidden h-[3.5rem] shrink-0 items-center gap-8 border-b border-white/[0.06] px-8 lg:px-12 md:flex"
-          style={{
-            background:
-              "linear-gradient(to bottom, rgba(5,5,5,0.92) 0%, rgba(5,5,5,0.78) 70%, rgba(5,5,5,0.55) 100%)",
-          }}
-        >
+        <header className="sticky top-0 z-30 hidden h-[3.5rem] shrink-0 items-center gap-3 border-b border-slate-200/90 bg-white/85 px-4 backdrop-blur-md md:flex md:min-w-0 md:px-6 lg:gap-5 lg:px-8">
           <Link
             href="/"
-            className="flex shrink-0 items-center gap-2 font-serif text-base font-medium tracking-tight text-white"
+            className="flex shrink-0 items-center gap-2 font-serif text-base font-medium tracking-tight text-slate-900"
           >
-            <Sparkles className="size-5 text-cyan-400" aria-hidden />
+            <Sparkles className="size-5 text-cyan-600" aria-hidden />
             Career-Hub AI
           </Link>
-          <DesktopTopNav />
-          <div className="ml-auto flex min-w-0 items-center gap-4">
+          <div className="min-w-0 flex-1 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] md:[&::-webkit-scrollbar]:hidden">
+            <DesktopTopNav />
+          </div>
+          <div className="flex shrink-0 items-center justify-end gap-2 sm:gap-3 lg:gap-4">
             <Button
               type="button"
               variant="outline"
               size="sm"
               className={cn(
-                "hidden shrink-0 gap-2 border-cyan-500/35 transition-all duration-500 md:inline-flex",
+                "hidden shrink-0 gap-2 border-cyan-300/80 bg-white transition-all duration-500 sm:inline-flex",
                 orchestratorPulsing &&
-                  "shadow-[0_0_18px_-4px_rgba(34,211,238,0.4)] ring-1 ring-cyan-400/35",
+                  "shadow-[0_0_18px_-4px_rgba(34,211,238,0.4)] ring-2 ring-cyan-400/30",
               )}
               onClick={() => setOpen(true)}
             >
               <Sparkles
                 className={cn(
-                  "size-3.5 text-cyan-400",
+                  "size-3.5 text-cyan-600",
                   orchestratorPulsing && "animate-pulse",
                 )}
               />
               Assistant
             </Button>
-            <span className="hidden font-mono text-[0.65rem] uppercase tracking-[0.2em] text-white/35 lg:inline">
+            <span className="hidden font-mono text-[0.65rem] uppercase tracking-[0.2em] text-slate-400 xl:inline">
               Private
             </span>
             {userEmail ? (
-              <span
-                className="hidden max-w-[200px] truncate font-mono text-[0.7rem] text-white/50 lg:inline"
-                title={userEmail}
-              >
-                {userEmail}
-              </span>
+              <>
+                <span
+                  className="hidden max-w-[min(12rem,28vw)] truncate font-mono text-[0.65rem] text-slate-600 md:inline xl:max-w-[220px]"
+                  title={userEmail}
+                >
+                  {userEmail}
+                </span>
+                <UserMenu email={userEmail} variant="header" />
+              </>
             ) : (
-              <Link
-                href="/login"
-                className="font-mono text-xs text-cyan-400/90 hover:text-cyan-300"
-              >
-                Sign in
-              </Link>
+              <UserMenu email={null} variant="header" />
             )}
           </div>
         </header>
 
-        <main className="relative flex-1 pb-28 md:pb-16">
-          <div className="mx-auto max-w-6xl px-6 py-16 md:px-10 md:py-20 lg:px-16">
+        <main className="relative min-w-0 flex-1 overflow-x-hidden pb-28 md:pb-16">
+          <div className="mx-auto w-full max-w-7xl min-w-0 px-4 py-12 sm:px-6 md:px-8 md:py-16 lg:px-10 lg:py-20">
             {children}
           </div>
         </main>
@@ -288,10 +254,10 @@ export function AppShell({
           className="fixed bottom-4 left-4 right-4 z-40 md:hidden"
           style={{
             boxShadow:
-              "0 -1px 0 0 rgba(34, 211, 238, 0.45), 0 25px 50px -12px rgba(0, 0, 0, 0.55)",
+              "0 -1px 0 0 rgba(34, 211, 238, 0.35), 0 25px 50px -12px rgba(15, 23, 42, 0.12)",
           }}
         >
-          <div className="flex items-center justify-between gap-1 rounded-2xl border border-white/10 bg-[#0a0a0a]/85 px-2 py-2 backdrop-blur-xl">
+          <div className="flex items-center justify-between gap-1 rounded-2xl border border-slate-200/90 bg-white/90 px-2 py-2 shadow-lg backdrop-blur-xl">
             {nav.map(({ href, short, icon: Icon }) => {
               const active =
                 href === "/"
@@ -304,8 +270,8 @@ export function AppShell({
                   className={cn(
                     "flex min-w-0 flex-1 flex-col items-center gap-0.5 rounded-xl py-2 font-mono text-[0.55rem] font-medium uppercase tracking-wider transition-all duration-500",
                     active
-                      ? "text-cyan-300"
-                      : "text-white/45 hover:text-white/75",
+                      ? "text-cyan-700"
+                      : "text-slate-500 hover:text-slate-800",
                   )}
                 >
                   <Icon className="size-4" aria-hidden />
@@ -318,7 +284,7 @@ export function AppShell({
               onClick={() => setOpen(true)}
               className={cn(
                 "flex min-w-0 flex-1 flex-col items-center gap-0.5 rounded-xl py-2 font-mono text-[0.55rem] font-medium uppercase tracking-wider transition-all duration-500",
-                orchestratorPulsing ? "text-cyan-300" : "text-white/45",
+                orchestratorPulsing ? "text-cyan-700" : "text-slate-500",
               )}
             >
               <MessageSquare className="size-4" aria-hidden />
@@ -327,27 +293,27 @@ export function AppShell({
           </div>
         </div>
 
-        <footer className="relative z-[1] border-t border-white/[0.05] bg-[#030303] text-white/70">
-          <div className="mx-auto grid max-w-6xl gap-12 px-6 py-16 md:grid-cols-3 md:gap-10 md:px-10 lg:px-16">
-            <div className="ch-section-rail space-y-4 border-cyan-500/25">
-              <div className="flex items-center gap-2 font-serif text-lg font-medium text-white">
-                <Sparkles className="size-5 text-cyan-400" aria-hidden />
+        <footer className="relative z-[1] border-t border-slate-200/90 bg-white/80 text-slate-600 backdrop-blur-sm">
+          <div className="mx-auto grid max-w-7xl gap-12 px-6 py-16 md:grid-cols-3 md:gap-10 md:px-10 lg:px-16">
+            <div className="ch-section-rail space-y-4 border-cyan-500/30">
+              <div className="flex items-center gap-2 font-serif text-lg font-medium text-slate-900">
+                <Sparkles className="size-5 text-cyan-600" aria-hidden />
                 Career-Hub AI
               </div>
-              <p className="ch-body max-w-md text-white/60">
+              <p className="ch-body max-w-md">
                 One workspace for applications, your evidence vault, and
                 relationship intelligence — built for operators who treat their
                 career like a system.
               </p>
             </div>
             <div>
-              <p className="ch-eyebrow text-white/50">Product</p>
+              <p className="ch-eyebrow text-slate-500">Product</p>
               <ul className="mt-6 space-y-3 font-mono text-xs uppercase tracking-wider">
                 {nav.map(({ href, label }) => (
                   <li key={href}>
                     <Link
                       href={href}
-                      className="text-white/55 transition-colors duration-500 hover:text-cyan-300/90"
+                      className="text-slate-600 transition-colors duration-500 hover:text-cyan-700"
                     >
                       {label}
                     </Link>
@@ -356,25 +322,25 @@ export function AppShell({
               </ul>
             </div>
             <div>
-              <p className="ch-eyebrow text-white/50">Legal</p>
-              <ul className="mt-6 space-y-3 font-mono text-xs uppercase tracking-wider text-white/55">
+              <p className="ch-eyebrow text-slate-500">Legal</p>
+              <ul className="mt-6 space-y-3 font-mono text-xs uppercase tracking-wider text-slate-600">
                 <li>
-                  <a href="#" className="hover:text-white/80">
+                  <a href="#" className="hover:text-slate-900">
                     Privacy
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-white/80">
+                  <a href="#" className="hover:text-slate-900">
                     Terms
                   </a>
                 </li>
               </ul>
             </div>
           </div>
-          <div className="border-t border-white/[0.05]">
-            <div className="mx-auto flex max-w-6xl flex-col gap-2 px-6 py-5 font-mono text-[0.65rem] uppercase tracking-wider text-white/35 md:flex-row md:items-center md:justify-between md:px-10 lg:px-16">
+          <div className="border-t border-slate-200/80">
+            <div className="mx-auto flex max-w-7xl flex-col gap-2 px-6 py-5 font-mono text-[0.65rem] uppercase tracking-wider text-slate-400 md:flex-row md:items-center md:justify-between md:px-10 lg:px-16">
               <span>© {year} Career-Hub AI</span>
-              <span className="text-white/25">
+              <span className="text-slate-400">
                 Your data stays in your workspace.
               </span>
             </div>

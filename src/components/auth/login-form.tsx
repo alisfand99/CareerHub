@@ -52,23 +52,22 @@ export function LoginForm() {
   }
 
   const inputClass = cn(
-    "box-border w-full min-h-12 rounded-lg border border-white/12 bg-white/[0.04] px-3 py-2.5 font-mono text-sm text-white shadow-none backdrop-blur-sm",
-    "placeholder:text-white/35 outline-none transition-all duration-500",
-    "focus-visible:border-cyan-500/45 focus-visible:ring-2 focus-visible:ring-cyan-400/20",
+    "box-border w-full min-h-12 rounded-lg border border-slate-200 bg-white px-3 py-2.5 font-mono text-sm text-slate-900 shadow-sm",
+    "placeholder:text-slate-400 outline-none transition-all duration-500",
+    "focus-visible:border-cyan-500 focus-visible:ring-2 focus-visible:ring-cyan-200",
     "disabled:cursor-not-allowed disabled:opacity-45",
   );
 
   return (
     <div
       className={cn(
-        "ch-glass-card mx-auto w-full max-w-md p-8 md:p-10",
-        "before:from-cyan-500/[0.06]",
+        "ch-glass-card mx-auto w-full max-w-md border-cyan-100/80 p-8 shadow-lg md:p-10",
       )}
     >
-      <h2 className="font-serif text-xl font-medium tracking-tight text-white md:text-2xl">
+      <h2 className="font-serif text-xl font-medium tracking-tight text-slate-900 md:text-2xl">
         Sign in
       </h2>
-      <p className="mt-2 font-serif text-sm font-light leading-relaxed text-white/60">
+      <p className="mt-2 text-sm font-normal leading-relaxed text-slate-600">
         Use the email and password you use for Career Hub.
       </p>
 
@@ -76,7 +75,7 @@ export function LoginForm() {
         <div className="flex w-full flex-col gap-2">
           <Label
             htmlFor="login-email"
-            className="font-mono text-[0.65rem] font-medium uppercase tracking-[0.22em] text-cyan-500/90"
+            className="font-mono text-[0.65rem] font-medium uppercase tracking-[0.22em] text-cyan-700"
           >
             Email
           </Label>
@@ -96,7 +95,7 @@ export function LoginForm() {
         <div className="flex w-full flex-col gap-2">
           <Label
             htmlFor="login-password"
-            className="font-mono text-[0.65rem] font-medium uppercase tracking-[0.22em] text-cyan-500/90"
+            className="font-mono text-[0.65rem] font-medium uppercase tracking-[0.22em] text-cyan-700"
           >
             Password
           </Label>
@@ -118,8 +117,8 @@ export function LoginForm() {
             className={cn(
               "rounded-lg border px-3 py-2 font-mono text-xs leading-relaxed",
               isError
-                ? "border-red-500/30 bg-red-500/10 text-red-200/90"
-                : "border-white/10 bg-white/[0.04] text-white/75",
+                ? "border-red-200 bg-red-50 text-red-800"
+                : "border-slate-200 bg-slate-50 text-slate-700",
             )}
             role="status"
           >
