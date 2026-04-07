@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   Briefcase,
@@ -152,7 +153,13 @@ export function AppShell({
             >
               <SheetHeader className="border-b border-slate-200/90 p-5 text-left">
                 <SheetTitle className="flex items-center gap-2 font-serif text-lg font-normal text-slate-900">
-                  <Sparkles className="size-5 text-cyan-600" aria-hidden />
+                  <Image
+                    src="/careerhub-logo.png"
+                    alt="Career-Hub AI logo"
+                    width={20}
+                    height={20}
+                    className="size-5"
+                  />
                   Career-Hub AI
                 </SheetTitle>
                 <p className="ch-eyebrow pt-1 !text-[0.55rem]">Navigation</p>
@@ -198,7 +205,13 @@ export function AppShell({
             href="/"
             className="flex shrink-0 items-center gap-2 font-serif text-base font-medium tracking-tight text-slate-900"
           >
-            <Sparkles className="size-5 text-cyan-600" aria-hidden />
+            <Image
+              src="/careerhub-logo.png"
+              alt="Career-Hub AI logo"
+              width={20}
+              height={20}
+              className="size-5"
+            />
             Career-Hub AI
           </Link>
           <div className="min-w-0 flex-1 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] md:[&::-webkit-scrollbar]:hidden">
@@ -297,7 +310,13 @@ export function AppShell({
           <div className="mx-auto grid max-w-7xl gap-12 px-6 py-16 md:grid-cols-3 md:gap-10 md:px-10 lg:px-16">
             <div className="ch-section-rail space-y-4 border-cyan-500/30">
               <div className="flex items-center gap-2 font-serif text-lg font-medium text-slate-900">
-                <Sparkles className="size-5 text-cyan-600" aria-hidden />
+                <Image
+                  src="/careerhub-logo.png"
+                  alt="Career-Hub AI logo"
+                  width={20}
+                  height={20}
+                  className="size-5"
+                />
                 Career-Hub AI
               </div>
               <p className="ch-body max-w-md">
