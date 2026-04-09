@@ -5,6 +5,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   Briefcase,
+  ClipboardList,
   LayoutDashboard,
   Menu,
   MessageSquare,
@@ -29,6 +30,7 @@ import { useOrchestrator } from "@/components/orchestrator/orchestrator-context"
 const nav = [
   { href: "/", label: "Dashboard", short: "Home", icon: LayoutDashboard },
   { href: "/apply-hub", label: "Apply Hub", short: "Apply", icon: Briefcase },
+  { href: "/interview-guide", label: "Interview Guide", short: "Guide", icon: ClipboardList },
   { href: "/bio-vault", label: "Bio-Vault", short: "Vault", icon: Vault },
   { href: "/network", label: "Network CRM", short: "Net", icon: Network },
 ];
