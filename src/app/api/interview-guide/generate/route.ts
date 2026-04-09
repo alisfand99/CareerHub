@@ -8,16 +8,42 @@ import { getGeminiApiKey, missingGeminiEnvMessage } from "@/lib/ai/env";
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
+const AnswerLengthSchema = z.enum(["short", "medium", "long"]);
+
 const BodySchema = z.object({
   action: z.enum(["generate_questions", "answer_question", "followup"]),
   jobId: z.string().min(1),
-  count: z.number().int().min(20).max(30).optional(),
+  count: z.number().int().min(5).max(50).optional(),
   question: z.string().optional(),
   answer: z.string().optional(),
+  answerLength: AnswerLengthSchema.optional(),
   history: z
     .array(z.object({ question: z.string(), answer: z.string() }))
     .optional(),
 });
+
+function answerLengthInstructions(length: "short" | "medium" | "long"): {
+  text: string;
+  maxTokens: number;
+} {
+  switch (length) {
+    case "short":
+      return {
+        text: "Length: SHORT — about 80–130 words total. Tight bullets or 2 very short paragraphs. No filler.",
+        maxTokens: 1200,
+      };
+    case "long":
+      return {
+        text: "Length: LONG — about 350–550 words. Rich detail, examples, and trade-offs where useful.",
+        maxTokens: 4500,
+      };
+    default:
+      return {
+        text: "Length: MEDIUM — about 180–280 words. Clear structure (context → actions → impact).",
+        maxTokens: 2500,
+      };
+  }
+}
 
 function stripJsonFences(text: string): string {
   const t = text.trim();
@@ -207,6 +233,8 @@ Return strict JSON:
       if (!q) {
         return NextResponse.json({ error: "Question is required." }, { status: 400 });
       }
+      const len = parsed.data.answerLength ?? "medium";
+      const { text: lenInstr, maxTokens } = answerLengthInstructions(len);
       const prompt = `${common}
 
 QUESTION:
@@ -214,23 +242,52 @@ ${q}
 
 TASK:
 Write a strong sample answer the candidate can practice.
-- concise but substantive
-- structured (context -> action -> impact)
-- technically credible
-Output plain text only.`;
+${lenInstr}
+- structured (context → actions → impact)
+- technically credible; no invented facts beyond the candidate snapshot
+
+Also extract 6–14 memorization keywords/phrases from YOUR answer (tools, metrics, patterns, frameworks) — short strings only, no full sentences.
+
+Return strict JSON only:
+{
+  "answer": "string",
+  "keywords": ["string", ...]
+}`;
       const result = await generateContentWithModelFallback(
         genAI,
         {
           generationConfig: {
             temperature: 0.4,
-            maxOutputTokens: 3072,
+            maxOutputTokens: maxTokens,
+            responseMimeType: "application/json",
           },
         },
         {
           contents: [{ role: "user", parts: [{ text: prompt }] }],
         },
       );
-      return NextResponse.json({ ok: true, answer: result.response.text().trim() });
+      const raw = stripJsonFences(result.response.text());
+      let answerText = "";
+      let keywords: string[] = [];
+      try {
+        const j = JSON.parse(raw) as { answer?: string; keywords?: unknown };
+        answerText = (j.answer ?? "").trim();
+        if (Array.isArray(j.keywords)) {
+          keywords = j.keywords
+            .filter((k): k is string => typeof k === "string" && k.trim().length > 0)
+            .map((k) => k.trim())
+            .slice(0, 20);
+        }
+      } catch {
+        answerText = raw.trim();
+      }
+      if (!answerText) {
+        return NextResponse.json(
+          { error: "Couldn’t generate an answer. Please try again." },
+          { status: 502 },
+        );
+      }
+      return NextResponse.json({ ok: true, answer: answerText, keywords });
     }
 
     const q = (parsed.data.question ?? "").trim();
@@ -238,6 +295,8 @@ Output plain text only.`;
       return NextResponse.json({ error: "Question is required." }, { status: 400 });
     }
     const a = (parsed.data.answer ?? "").trim();
+    const len = parsed.data.answerLength ?? "medium";
+    const { text: lenInstr, maxTokens } = answerLengthInstructions(len);
     const history =
       parsed.data.history?.map((h, i) => `${i + 1}) Q: ${h.question}\nA: ${h.answer}`).join("\n\n") ??
       "(none)";
@@ -255,17 +314,22 @@ ${history}
 
 TASK:
 Generate the next deeper follow-up question on the same topic and provide a model answer.
+${lenInstr}
+
+Also extract 6–14 memorization keywords/phrases from the follow-up answer only.
+
 Return strict JSON:
 {
   "followup_question": "string",
-  "followup_answer": "string"
+  "followup_answer": "string",
+  "keywords": ["string", ...]
 }`;
     const result = await generateContentWithModelFallback(
       genAI,
       {
         generationConfig: {
           temperature: 0.45,
-          maxOutputTokens: 4096,
+          maxOutputTokens: Math.min(maxTokens + 800, 8192),
           responseMimeType: "application/json",
         },
       },
@@ -277,6 +341,7 @@ Return strict JSON:
     const parsedJson = JSON.parse(raw) as {
       followup_question?: string;
       followup_answer?: string;
+      keywords?: unknown;
     };
     if (!parsedJson.followup_question || !parsedJson.followup_answer) {
       return NextResponse.json(
@@ -284,10 +349,17 @@ Return strict JSON:
         { status: 502 },
       );
     }
+    const kw = Array.isArray(parsedJson.keywords)
+      ? parsedJson.keywords
+          .filter((k): k is string => typeof k === "string" && k.trim().length > 0)
+          .map((k) => k.trim())
+          .slice(0, 20)
+      : [];
     return NextResponse.json({
       ok: true,
       followup_question: parsedJson.followup_question.trim(),
       followup_answer: parsedJson.followup_answer.trim(),
+      keywords: kw,
     });
   } catch {
     return NextResponse.json(

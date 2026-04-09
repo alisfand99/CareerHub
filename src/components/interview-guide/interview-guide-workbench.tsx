@@ -1,11 +1,72 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Loader2, Plus, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+
+const QUESTION_COUNT_MIN = 5;
+const QUESTION_COUNT_MAX = 50;
+const QUESTION_COUNT_DEFAULT = 20;
+const LS_COUNT = "interview-guide:question-count";
+const LS_ANSWER_LENGTH = "interview-guide:answer-length";
+
+type AnswerLength = "short" | "medium" | "long";
+
+function clampQuestionCount(n: number): number {
+  if (!Number.isFinite(n)) return QUESTION_COUNT_DEFAULT;
+  return Math.max(QUESTION_COUNT_MIN, Math.min(QUESTION_COUNT_MAX, Math.round(n)));
+}
+
+function escapeRegExp(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function HighlightedAnswer({
+  text,
+  keywords,
+}: {
+  text: string;
+  keywords?: string[];
+}) {
+  const terms = useMemo(() => {
+    const uniq = Array.from(new Set((keywords ?? []).filter(Boolean))).sort(
+      (a, b) => b.length - a.length,
+    );
+    return uniq;
+  }, [keywords]);
+
+  if (!terms.length) {
+    return <p className="whitespace-pre-wrap text-slate-800">{text}</p>;
+  }
+
+  const inner = terms.map(escapeRegExp).join("|");
+  if (!inner) {
+    return <p className="whitespace-pre-wrap text-slate-800">{text}</p>;
+  }
+
+  const re = new RegExp(`(${inner})`, "gi");
+  const pieces = text.split(re);
+
+  return (
+    <p className="whitespace-pre-wrap text-slate-800">
+      {pieces.map((piece, i) =>
+        i % 2 === 1 ? (
+          <mark
+            key={`kw-${i}`}
+            className="rounded-sm bg-amber-200/90 px-0.5 font-medium text-slate-900"
+          >
+            {piece}
+          </mark>
+        ) : (
+          <span key={`t-${i}`}>{piece}</span>
+        ),
+      )}
+    </p>
+  );
+}
 
 type JobOption = {
   id: string;
@@ -18,6 +79,7 @@ type FollowupItem = {
   id: string;
   question: string;
   answer: string;
+  keywords?: string[];
 };
 
 type QuestionItem = {
@@ -26,6 +88,7 @@ type QuestionItem = {
   category?: string;
   level?: string;
   answer?: string;
+  answerKeywords?: string[];
   followups: FollowupItem[];
   loadingAnswer?: boolean;
   loadingFollowup?: boolean;
@@ -39,16 +102,44 @@ type ApiResponse = {
     level?: string;
   }>;
   answer?: string;
+  keywords?: string[];
   followup_question?: string;
   followup_answer?: string;
 };
 
 export function InterviewGuideWorkbench({ jobs }: { jobs: JobOption[] }) {
   const [jobId, setJobId] = useState(jobs[0]?.id ?? "");
-  const [count, setCount] = useState(20);
+  const [countStr, setCountStr] = useState(String(QUESTION_COUNT_DEFAULT));
+  const [answerLength, setAnswerLength] = useState<AnswerLength>("medium");
   const [questions, setQuestions] = useState<QuestionItem[]>([]);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(LS_COUNT);
+      if (raw !== null) {
+        const n = parseInt(raw, 10);
+        if (Number.isFinite(n)) {
+          setCountStr(String(clampQuestionCount(n)));
+        }
+      }
+      const len = localStorage.getItem(LS_ANSWER_LENGTH);
+      if (len === "short" || len === "medium" || len === "long") {
+        setAnswerLength(len);
+      }
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(LS_ANSWER_LENGTH, answerLength);
+    } catch {
+      /* ignore */
+    }
+  }, [answerLength]);
 
   const selectedJob = useMemo(
     () => jobs.find((j) => j.id === jobId) ?? null,
@@ -88,8 +179,9 @@ export function InterviewGuideWorkbench({ jobs }: { jobs: JobOption[] }) {
         <CardHeader>
           <CardTitle className="text-base">Build your question set</CardTitle>
           <CardDescription>
-            20-30 core questions: technical depth, system design, product
-            thinking, and behavioral focus.
+            {QUESTION_COUNT_MIN}–{QUESTION_COUNT_MAX} questions: technical depth,
+            system design, product thinking, and behavioral focus. Model answers
+            use the length you pick below.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -113,13 +205,26 @@ export function InterviewGuideWorkbench({ jobs }: { jobs: JobOption[] }) {
               <Label htmlFor="ig-count">Questions</Label>
               <Input
                 id="ig-count"
-                type="number"
-                min={20}
-                max={30}
-                value={count}
+                type="text"
+                inputMode="numeric"
+                autoComplete="off"
+                placeholder={String(QUESTION_COUNT_DEFAULT)}
+                value={countStr}
                 onChange={(e) => {
-                  const n = Number.parseInt(e.target.value, 10);
-                  if (Number.isFinite(n)) setCount(Math.max(20, Math.min(30, n)));
+                  const v = e.target.value.trim();
+                  if (v === "" || /^\d+$/.test(v)) setCountStr(v);
+                }}
+                onBlur={() => {
+                  const n = parseInt(countStr, 10);
+                  const next = String(
+                    clampQuestionCount(Number.isFinite(n) ? n : QUESTION_COUNT_DEFAULT),
+                  );
+                  setCountStr(next);
+                  try {
+                    localStorage.setItem(LS_COUNT, next);
+                  } catch {
+                    /* ignore */
+                  }
                 }}
               />
             </div>
@@ -133,6 +238,16 @@ export function InterviewGuideWorkbench({ jobs }: { jobs: JobOption[] }) {
                   setBusy(true);
                   setErr(null);
                   try {
+                    const parsed = parseInt(countStr, 10);
+                    const count = clampQuestionCount(
+                      Number.isFinite(parsed) ? parsed : QUESTION_COUNT_DEFAULT,
+                    );
+                    setCountStr(String(count));
+                    try {
+                      localStorage.setItem(LS_COUNT, String(count));
+                    } catch {
+                      /* ignore */
+                    }
                     const json = await post({
                       action: "generate_questions",
                       jobId,
@@ -172,6 +287,38 @@ export function InterviewGuideWorkbench({ jobs }: { jobs: JobOption[] }) {
             </div>
           </div>
 
+          <div className="space-y-2">
+            <Label>Answer length</Label>
+            <p className="text-xs text-slate-600">
+              Applies to &quot;Generate answer&quot; and each &quot;Deepen this topic&quot;
+              response.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {(
+                [
+                  { id: "short" as const, label: "Short" },
+                  { id: "medium" as const, label: "Medium" },
+                  { id: "long" as const, label: "Long" },
+                ] as const
+              ).map(({ id, label }) => (
+                <Button
+                  key={id}
+                  type="button"
+                  size="sm"
+                  variant={answerLength === id ? "default" : "outline"}
+                  className={
+                    answerLength === id
+                      ? "bg-cyan-700 hover:bg-cyan-800"
+                      : "border-slate-300"
+                  }
+                  onClick={() => setAnswerLength(id)}
+                >
+                  {label}
+                </Button>
+              ))}
+            </div>
+          </div>
+
           {selectedJob ? (
             <p className="text-xs text-slate-600">
               Targeting: <span className="font-medium">{selectedJob.title}</span> at{" "}
@@ -204,8 +351,8 @@ export function InterviewGuideWorkbench({ jobs }: { jobs: JobOption[] }) {
               </CardHeader>
               <CardContent className="space-y-3">
                 {q.answer ? (
-                  <div className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-800">
-                    {q.answer}
+                  <div className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm">
+                    <HighlightedAnswer text={q.answer} keywords={q.answerKeywords} />
                   </div>
                 ) : null}
 
@@ -225,6 +372,7 @@ export function InterviewGuideWorkbench({ jobs }: { jobs: JobOption[] }) {
                           action: "answer_question",
                           jobId,
                           question: q.question,
+                          answerLength,
                         });
                         setQuestions((prev) =>
                           prev.map((item) =>
@@ -234,6 +382,9 @@ export function InterviewGuideWorkbench({ jobs }: { jobs: JobOption[] }) {
                                   answer:
                                     json.answer ||
                                     "No answer returned. Try again.",
+                                  answerKeywords: Array.isArray(json.keywords)
+                                    ? json.keywords
+                                    : undefined,
                                   loadingAnswer: false,
                                 }
                               : item,
@@ -273,11 +424,13 @@ export function InterviewGuideWorkbench({ jobs }: { jobs: JobOption[] }) {
                           question: q.question,
                           answer: q.answer ?? "",
                           history,
+                          answerLength,
                         });
                         const fq = json.followup_question ?? "Follow-up question";
                         const fa =
                           json.followup_answer ??
                           "No follow-up answer returned. Try again.";
+                        const fkw = Array.isArray(json.keywords) ? json.keywords : undefined;
                         setQuestions((prev) =>
                           prev.map((item) =>
                             item.id === q.id
@@ -289,6 +442,7 @@ export function InterviewGuideWorkbench({ jobs }: { jobs: JobOption[] }) {
                                       id: crypto.randomUUID(),
                                       question: fq,
                                       answer: fa,
+                                      keywords: fkw,
                                     },
                                   ],
                                   loadingFollowup: false,
@@ -324,7 +478,9 @@ export function InterviewGuideWorkbench({ jobs }: { jobs: JobOption[] }) {
                         <p className="font-medium text-slate-900">
                           {i + 1}. {fup.question}
                         </p>
-                        <p className="mt-1 text-slate-700">{fup.answer}</p>
+                        <div className="mt-1 text-sm text-slate-700">
+                          <HighlightedAnswer text={fup.answer} keywords={fup.keywords} />
+                        </div>
                       </div>
                     ))}
                   </div>
