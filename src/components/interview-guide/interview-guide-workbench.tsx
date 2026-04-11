@@ -6,6 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  inferHighlightTerms,
+  normalizeAnswerForDisplay,
+  normalizeFollowupAnswerForDisplay,
+} from "@/lib/interview-guide/parse-model-json";
 
 const QUESTION_COUNT_MIN = 5;
 const QUESTION_COUNT_MAX = 50;
@@ -27,28 +32,43 @@ function escapeRegExp(s: string): string {
 function HighlightedAnswer({
   text,
   keywords,
+  question,
+  variant = "answer",
 }: {
   text: string;
   keywords?: string[];
+  /** Used to infer highlight terms when the model omits `keywords`. */
+  question?: string;
+  variant?: "answer" | "followup";
 }) {
+  const { text: displayText, keywords: mergedKw } = useMemo(() => {
+    return variant === "followup"
+      ? normalizeFollowupAnswerForDisplay(text, keywords)
+      : normalizeAnswerForDisplay(text, keywords);
+  }, [text, keywords, variant]);
+
   const terms = useMemo(() => {
-    const uniq = Array.from(new Set((keywords ?? []).filter(Boolean))).sort(
+    const fromModel = mergedKw.filter(Boolean);
+    const inferred =
+      fromModel.length === 0 && displayText.trim().length > 0
+        ? inferHighlightTerms(displayText, question)
+        : [];
+    return Array.from(new Set([...fromModel, ...inferred])).sort(
       (a, b) => b.length - a.length,
     );
-    return uniq;
-  }, [keywords]);
+  }, [mergedKw, displayText, question]);
 
   if (!terms.length) {
-    return <p className="whitespace-pre-wrap text-slate-800">{text}</p>;
+    return <p className="whitespace-pre-wrap text-slate-800">{displayText}</p>;
   }
 
   const inner = terms.map(escapeRegExp).join("|");
   if (!inner) {
-    return <p className="whitespace-pre-wrap text-slate-800">{text}</p>;
+    return <p className="whitespace-pre-wrap text-slate-800">{displayText}</p>;
   }
 
   const re = new RegExp(`(${inner})`, "gi");
-  const pieces = text.split(re);
+  const pieces = displayText.split(re);
 
   return (
     <p className="whitespace-pre-wrap text-slate-800">
@@ -352,7 +372,11 @@ export function InterviewGuideWorkbench({ jobs }: { jobs: JobOption[] }) {
               <CardContent className="space-y-3">
                 {q.answer ? (
                   <div className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm">
-                    <HighlightedAnswer text={q.answer} keywords={q.answerKeywords} />
+                    <HighlightedAnswer
+                      text={q.answer}
+                      keywords={q.answerKeywords}
+                      question={q.question}
+                    />
                   </div>
                 ) : null}
 
@@ -479,7 +503,12 @@ export function InterviewGuideWorkbench({ jobs }: { jobs: JobOption[] }) {
                           {i + 1}. {fup.question}
                         </p>
                         <div className="mt-1 text-sm text-slate-700">
-                          <HighlightedAnswer text={fup.answer} keywords={fup.keywords} />
+                          <HighlightedAnswer
+                            variant="followup"
+                            text={fup.answer}
+                            keywords={fup.keywords}
+                            question={fup.question}
+                          />
                         </div>
                       </div>
                     ))}

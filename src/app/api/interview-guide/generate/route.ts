@@ -4,6 +4,11 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { createClient } from "@/lib/supabase/server";
 import { generateContentWithModelFallback } from "@/lib/ai/gemini-run";
 import { getGeminiApiKey, missingGeminiEnvMessage } from "@/lib/ai/env";
+import {
+  parseAnswerQuestionResponse,
+  parseFollowupResponse,
+  stripJsonFences,
+} from "@/lib/interview-guide/parse-model-json";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -43,12 +48,6 @@ function answerLengthInstructions(length: "short" | "medium" | "long"): {
         maxTokens: 2500,
       };
   }
-}
-
-function stripJsonFences(text: string): string {
-  const t = text.trim();
-  if (!t.startsWith("```")) return t;
-  return t.replace(/^```[a-z0-9]*\s*/i, "").replace(/\s*```$/i, "").trim();
 }
 
 function summarizeCandidate(data: {
@@ -248,6 +247,8 @@ ${lenInstr}
 
 Also extract 6–14 memorization keywords/phrases from YOUR answer (tools, metrics, patterns, frameworks) — short strings only, no full sentences.
 
+The "answer" value must be a single valid JSON string: escape internal double-quotes as \\" and use \\n for line breaks — never put raw newline characters inside the string.
+
 Return strict JSON only:
 {
   "answer": "string",
@@ -267,20 +268,7 @@ Return strict JSON only:
         },
       );
       const raw = stripJsonFences(result.response.text());
-      let answerText = "";
-      let keywords: string[] = [];
-      try {
-        const j = JSON.parse(raw) as { answer?: string; keywords?: unknown };
-        answerText = (j.answer ?? "").trim();
-        if (Array.isArray(j.keywords)) {
-          keywords = j.keywords
-            .filter((k): k is string => typeof k === "string" && k.trim().length > 0)
-            .map((k) => k.trim())
-            .slice(0, 20);
-        }
-      } catch {
-        answerText = raw.trim();
-      }
+      const { answer: answerText, keywords } = parseAnswerQuestionResponse(raw);
       if (!answerText) {
         return NextResponse.json(
           { error: "Couldn’t generate an answer. Please try again." },
@@ -318,6 +306,8 @@ ${lenInstr}
 
 Also extract 6–14 memorization keywords/phrases from the follow-up answer only.
 
+"followup_answer" must be one valid JSON string (use \\n for line breaks, never raw newlines inside quotes).
+
 Return strict JSON:
 {
   "followup_question": "string",
@@ -338,28 +328,18 @@ Return strict JSON:
       },
     );
     const raw = stripJsonFences(result.response.text());
-    const parsedJson = JSON.parse(raw) as {
-      followup_question?: string;
-      followup_answer?: string;
-      keywords?: unknown;
-    };
-    if (!parsedJson.followup_question || !parsedJson.followup_answer) {
+    const followupPayload = parseFollowupResponse(raw);
+    if (!followupPayload.followup_question || !followupPayload.followup_answer) {
       return NextResponse.json(
         { error: "Couldn’t generate a follow-up. Please try again." },
         { status: 502 },
       );
     }
-    const kw = Array.isArray(parsedJson.keywords)
-      ? parsedJson.keywords
-          .filter((k): k is string => typeof k === "string" && k.trim().length > 0)
-          .map((k) => k.trim())
-          .slice(0, 20)
-      : [];
     return NextResponse.json({
       ok: true,
-      followup_question: parsedJson.followup_question.trim(),
-      followup_answer: parsedJson.followup_answer.trim(),
-      keywords: kw,
+      followup_question: followupPayload.followup_question,
+      followup_answer: followupPayload.followup_answer,
+      keywords: followupPayload.keywords,
     });
   } catch {
     return NextResponse.json(

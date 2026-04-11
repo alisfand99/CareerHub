@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   description:
     "Command center for career intelligence: applications, Bio-Vault, and network CRM.",
   icons: {
-    icon: "/careerhub-logo.png",
+    icon: [{ url: "/careerhub-logo.png", type: "image/png" }],
     shortcut: "/careerhub-logo.png",
     apple: "/careerhub-logo.png",
   },
