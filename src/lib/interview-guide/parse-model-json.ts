@@ -79,6 +79,15 @@ function escapeRegExpToken(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+function scanRegex(s: string, re: RegExp, fn: (m: RegExpExecArray) => void): void {
+  const r = new RegExp(re.source, re.flags.includes("g") ? re.flags : `${re.flags}g`);
+  let m: RegExpExecArray | null;
+  while ((m = r.exec(s)) !== null) {
+    fn(m);
+    if (m[0].length === 0) r.lastIndex++;
+  }
+}
+
 /**
  * When the model omits `keywords`, derive short phrases from the answer (and optionally the question)
  * so the UI can still highlight memorization targets (products, frameworks, acronyms).
@@ -88,35 +97,35 @@ export function inferHighlightTerms(answer: string, question?: string): string[]
   const a = answer.trim();
   if (!a) return [];
 
-  for (const m of a.matchAll(/`([^`]{2,60})`/g)) {
+  scanRegex(a, /`([^`]{2,60})`/g, (m) => {
     const t = m[1].trim();
     if (t) terms.add(t);
-  }
+  });
 
-  for (const m of a.matchAll(/\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)\b/g)) {
+  scanRegex(a, /\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)\b/g, (m) => {
     const t = m[1].trim();
     if (t.length >= 4) terms.add(t);
-  }
+  });
 
-  for (const m of a.matchAll(/\b[A-Z][a-z]*[A-Z][a-zA-Z0-9]{1,40}\b/g)) {
+  scanRegex(a, /\b[A-Z][a-z]*[A-Z][a-zA-Z0-9]{1,40}\b/g, (m) => {
     terms.add(m[0]);
-  }
+  });
 
-  for (const m of a.matchAll(/\b[A-Z]{2,5}\b/g)) {
+  scanRegex(a, /\b[A-Z]{2,5}\b/g, (m) => {
     terms.add(m[0]);
-  }
+  });
 
-  for (const m of a.matchAll(/\b[a-z]{2,}(?:-[a-z0-9]{2,})+\b/gi)) {
+  scanRegex(a, /\b[a-z]{2,}(?:-[a-z0-9]{2,})+\b/gi, (m) => {
     const t = m[0];
     if (t.length >= 5) terms.add(t);
-  }
+  });
 
-  for (const m of a.matchAll(/\b\d+(?:\.\d+)?%/g)) {
+  scanRegex(a, /\b\d+(?:\.\d+)?%/g, (m) => {
     terms.add(m[0]);
-  }
-  for (const m of a.matchAll(/\b\d+[–-]\d+\s*(?:years?|mos?|months?)\b/gi)) {
+  });
+  scanRegex(a, /\b\d+[–-]\d+\s*(?:years?|mos?|months?)\b/gi, (m) => {
     terms.add(m[0]);
-  }
+  });
 
   if (question?.trim()) {
     const qwords =
